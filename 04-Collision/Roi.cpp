@@ -1,0 +1,68 @@
+#include "Roi.h"
+CRoi::CRoi() {
+	type = ROI_TYPE;
+	//IsThrowing = false;
+	dead = false;
+}
+void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
+{
+	left = x +50;
+	top = y+ 4;
+	right = x + ROI_BBOX_WIDTH+50;
+	bottom = y + ROI_BBOX_HEIGHT+4;
+}
+
+void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	// Calculate dx, dy 
+	
+	vector<LPGAMEOBJECT> coEvents;
+
+	coEvents.clear();
+
+	for (UINT i = 0; i < coObjects->size(); i++)
+	{
+		if (IsCollisionAABB(GetRect(), coObjects->at(i)->GetRect()))
+		{
+			coEvents.push_back(coObjects->at(i));
+		}
+	}
+
+
+	if (coEvents.size() == 0){}
+	else
+	{
+		for (UINT i = 0; i < coEvents.size(); i++)
+		{
+			if (coEvents.at(i)->type == GOOMBA_TYPE) 
+				coEvents.at(i)->dead = true;
+			
+		}
+	}
+
+}
+
+void CRoi::Render()
+{
+	int ani;
+
+	if (nx = 1) {
+		ani = ROI_ANI;
+	}
+	if (animations[ani]->isLastFrame) {
+		dead = true;
+	}
+	animations[ani]->Render(x, y);
+	RenderBoundingBox();
+}
+
+void CRoi::SetState(int state)
+{
+	CGameObject::SetState(state);
+	switch (state)
+	{
+	case ROI_ANI:
+		nx = 1;
+		break;
+	}
+}
