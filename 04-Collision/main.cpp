@@ -32,12 +32,13 @@
 #include "Goomba.h"
 #include "Roi.h"
 #include "Map.h"
+#include "Nen.h"
 
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
 #define MAIN_WINDOW_TITLE L"04 - Collision"
 
-#define BACKGROUND_COLOR D3DCOLOR_XRGB(255, 255, 200)
+#define BACKGROUND_COLOR D3DCOLOR_XRGB(0, 0, 0)
 #define SCREEN_WIDTH 550
 #define SCREEN_HEIGHT 475
 
@@ -47,6 +48,7 @@
 #define ID_TEX_ENEMY 10
 #define ID_TEX_MISC 20
 #define ID_TEX_ROI 30
+#define ID_TEX_NEN 40
 
 CGame *game;
 
@@ -54,8 +56,10 @@ CMario *mario;
 CGoomba *goomba;
 CRoi* roi;
 Map* map;
-vector<LPGAMEOBJECT> objects;
+Nen* nen;
 
+vector<LPGAMEOBJECT> objects;
+CMario * CMario::__instance = NULL;
 class CSampleKeyHander: public CKeyEventHandler
 {
 	virtual void KeyState(BYTE *states);
@@ -146,7 +150,9 @@ void LoadResources()
 	textures->Add(ID_TEX_MARIO, L"textures\\simon.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_MISC, L"textures\\misc.png", D3DCOLOR_XRGB(176, 224, 248));
-	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(255, 0, 255));
+	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(176, 224, 24));
+	textures->Add(ID_TEX_NEN, L"textures\\Static_Obj.png", D3DCOLOR_XRGB(176, 224, 24));
+
 	textures->Add(99, L"textures\\title1.png", D3DCOLOR_XRGB(255, 255, 255));
 
 	textures->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
@@ -211,7 +217,8 @@ void LoadResources()
 	sprites->Add(40012, 159, 0, 318, 68, texRoi);
 	sprites->Add(40013, 318, 0, 477, 68, texRoi);
 
-
+	LPDIRECT3DTEXTURE9 texNen = textures->Get(ID_TEX_NEN);
+	sprites->Add(60001, 400, 0, 432, 42, texNen); // nen
 
 	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
 
@@ -300,7 +307,7 @@ void LoadResources()
 	ani->Add(30001);
 	animations->Add(802, ani);
 
-	ani = new CAnimation(100);
+	ani = new CAnimation(100);	// brick
 	ani->Add(30001);
 	animations->Add(901, ani);
 
@@ -316,7 +323,12 @@ void LoadResources()
 	ani->Add(40013);
 	animations->Add(301, ani);
 
-	mario = new CMario();
+	ani = new CAnimation(100);		// nen
+	ani->Add(60001);
+	animations->Add(902, ani);
+
+
+	mario = mario->GetInstance();
 	mario->AddAnimation(400);		// idle right
 	mario->AddAnimation(401);		// idle left
 	mario->AddAnimation(500);		// walk right
@@ -354,7 +366,7 @@ void LoadResources()
 	}*/
 
 
-	for (int i = 0; i < 60; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		CBrick *brick = new CBrick();
 		brick->AddAnimation(901);
@@ -373,7 +385,12 @@ void LoadResources()
 		goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
 		objects.push_back(goomba);
 	}
-
+	//nen
+	Nen *nen = new Nen();
+	nen->AddAnimation(902);
+	nen->AddAnimation(400);
+	nen->SetPosition(400 + 0 * 16.0f, 320);
+	objects.push_back(nen);
 	
 }
 
@@ -387,9 +404,13 @@ void Update(DWORD dt)
 	// TO-DO: This is a "dirty" way, need a more organized way 
 
 	vector<LPGAMEOBJECT> coObjects;
+	vector<LPGAMEOBJECT> wallObjects;
 	for (int i = 1; i < objects.size(); i++)
 	{
-		coObjects.push_back(objects[i]);
+		if (objects[i]->type == BRICK_TYPE) {
+			wallObjects.push_back(objects[i]);
+		}
+		else coObjects.push_back(objects[i]);
 	}
 	if (mario->hitting == true && mario->allowCreateWhip==true )
 	{
@@ -397,9 +418,11 @@ void Update(DWORD dt)
 
 		mario->GetPosition(x, y);
 		roi = new CRoi();
-		if (mario->nx > 0)
+		if (mario->nx > 0) // kiem tra simon o stay nao thi tao ra roi do
 		{
 			roi->AddAnimation(300);
+			roi->AddAnimation(400);
+
 			roi->SetPosition(x - 30, y - 4);
 		}
 		else
@@ -421,13 +444,16 @@ void Update(DWORD dt)
 	{
 		if ((objects[i]->type == GOOMBA_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
-	}
-	for (int i = 0; i < objects.size(); i++)
-	{
-		if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
+
+		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
+			objects.erase(objects.begin() + i);
+
+		else if ((objects[i]->type == NEN_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
 	}
 
+	
+	mario->vaChamTuong(dt, &wallObjects);
 	// Update camera to follow mario
 	float cx, cy;
 	mario->GetPosition(cx, cy);
@@ -564,7 +590,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	LoadResources();
 
-	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH*2, SCREEN_HEIGHT*2, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+	SetWindowPos(hWnd, 0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
 
 	Run();
 
