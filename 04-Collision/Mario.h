@@ -18,7 +18,9 @@
 #define MARIO_STATE_SIT_LEFT		500
 #define MARIO_STATE_SIT_RIGHT		600
 #define MARIO_STATE_HIT				700
-#define MARIO_STATE_DIE				900
+#define MARIO_STATE_LAUNCH			800
+#define MARIO_STATE_INJURED			900
+#define MARIO_STATE_DIE				1000
 
 #define MARIO_ANI_IDLE_RIGHT		0
 #define MARIO_ANI_IDLE_LEFT			1
@@ -32,8 +34,10 @@
 #define MARIO_ANI_HIT_LEFT			9
 #define MARIO_ANI_HIT_SIT_RIGHT		10
 #define MARIO_ANI_HIT_SIT_LEFT		11
+#define MARIO_ANI_LAUNCH_RIGHT		12
+#define MARIO_ANI_LAUNCH_LEFT		13
 
-#define MARIO_ANI_DIE				12
+#define MARIO_ANI_DIE				14
 
 #define	MARIO_TYPE 11
 
@@ -46,6 +50,8 @@
 
 class CMario : public CGameObject
 {
+private:
+	static CMario* _instance;
 	int level;
 	int untouchable;
 	DWORD untouchable_start;
@@ -53,6 +59,8 @@ public:
 	boolean jumping = false;
 	boolean sitting = false;
 	boolean hitting = false;
+	boolean launching = false;
+	boolean injured = false;
 	boolean allowCreateWhip = false;
 	float mario_x, mario_y;
 	CMario() : CGameObject()
@@ -66,6 +74,6 @@ public:
 	void SetState(int state);
 	void SetLevel(int l) { level = l; }
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
-
+	static CMario* GetInstance();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 };

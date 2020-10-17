@@ -31,6 +31,7 @@
 #include "Brick.h"
 #include "Goomba.h"
 #include "Roi.h"
+#include "Dao.h"
 #include "Map.h"
 
 
@@ -47,12 +48,15 @@
 #define ID_TEX_ENEMY 10
 #define ID_TEX_MISC 20
 #define ID_TEX_ROI 30
+#define ID_TEX_DAO 40
+
 
 CGame *game;
 
 CMario *mario;
 CGoomba *goomba;
 CRoi* roi;
+CDao* dao;
 Map* map;
 vector<LPGAMEOBJECT> objects;
 
@@ -76,9 +80,18 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 			mario->SetState(MARIO_STATE_JUMP);
 		break;
 	case DIK_A:
-		DebugOut(L"[INFO] A: %d\n", KeyCode);
-		if (mario->hitting==false)
-		mario->SetState(MARIO_STATE_HIT);
+		if (game->IsKeyDown(DIK_UP))
+		{
+			DebugOut(L"[INFO] A danh: %d\n", KeyCode);
+			if (mario->hitting == false)
+				mario->SetState(MARIO_STATE_LAUNCH);
+		}
+		else
+		{
+			DebugOut(L"[INFO] A: %d\n", KeyCode);
+			if (mario->hitting == false)
+				mario->SetState(MARIO_STATE_HIT);
+		}
 		break;
 	}
 }
@@ -91,7 +104,7 @@ void CSampleKeyHander::OnKeyUp(int KeyCode)
 void CSampleKeyHander::KeyState(BYTE *states)
 {
 	// disable control key when Mario die 
-	if (mario->jumping == false && mario->hitting==false)
+	if (mario->jumping == false && mario->hitting==false && mario->injured==false)
 	{
 		if (game->IsKeyDown(DIK_RIGHT))
 		{
@@ -111,9 +124,14 @@ void CSampleKeyHander::KeyState(BYTE *states)
 		{
 			if (game->IsKeyDown(DIK_RIGHT)) mario->SetState(MARIO_STATE_SIT_RIGHT);
 			else if (game->IsKeyDown(DIK_LEFT)) mario->SetState(MARIO_STATE_SIT_LEFT);
+			else if (game->IsKeyDown(DIK_UP)) mario->SetState(MARIO_STATE_IDLE);
 			else mario->SetState(MARIO_STATE_SIT);
 		}
-		else mario->SetState(MARIO_STATE_IDLE);
+		else
+		{
+			if(mario->GetState() != MARIO_STATE_INJURED || mario->vy > 0)
+				mario->SetState(MARIO_STATE_IDLE);
+		}
 	}
 }
 
@@ -147,6 +165,7 @@ void LoadResources()
 	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_MISC, L"textures\\misc.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(255, 0, 255));
+	textures->Add(ID_TEX_DAO, L"textures\\Sub_weapons.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(99, L"textures\\title1.png", D3DCOLOR_XRGB(255, 255, 255));
 
 	textures->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
@@ -190,6 +209,12 @@ void LoadResources()
 	sprites->Add(100162, 11, 133, 43, 179, texMario);
 	sprites->Add(100163, 60, 135, 105, 179, texMario);
 
+	// phi dao phai dung
+	sprites->Add(10006, 120, 202, 168, 261, texMario);
+
+	// phi dao trai dung
+	sprites->Add(10016, 312, 4, 359, 63, texMario);
+
 
 	LPDIRECT3DTEXTURE9 texEnemy = textures->Get(ID_TEX_ENEMY);
 	sprites->Add(20001, 255, 0, 288, 64, texEnemy);
@@ -197,6 +222,8 @@ void LoadResources()
 
 	sprites->Add(20011, 362, 0, 392, 64, texEnemy);
 	sprites->Add(20012, 324, 0, 356, 64, texEnemy);
+
+	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
 
 	LPDIRECT3DTEXTURE9 texMisc = textures->Get(ID_TEX_MISC);
 	sprites->Add(30001, 408, 225, 424, 241, texMisc);
@@ -211,9 +238,11 @@ void LoadResources()
 	sprites->Add(40012, 159, 0, 318, 68, texRoi);
 	sprites->Add(40013, 318, 0, 477, 68, texRoi);
 
+	LPDIRECT3DTEXTURE9 texDao = textures->Get(ID_TEX_DAO);
 
+	sprites->Add(50001, 32, 64, 63, 81, texDao);  //dao phi qua phai
 
-	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
+	sprites->Add(50011, 65, 64, 95, 81, texDao); //dao phi qua trai
 
 	LPANIMATION ani;
 
@@ -316,7 +345,15 @@ void LoadResources()
 	ani->Add(40013);
 	animations->Add(301, ani);
 
-	mario = new CMario();
+	ani = new CAnimation(100);   //dao phai
+	ani->Add(50001);
+	animations->Add(3000, ani);
+
+	ani = new CAnimation(100);   //dao trai
+	ani->Add(50011);
+	animations->Add(3001, ani);
+
+	mario = mario->GetInstance();
 	mario->AddAnimation(400);		// idle right
 	mario->AddAnimation(401);		// idle left
 	mario->AddAnimation(500);		// walk right
@@ -396,21 +433,28 @@ void Update(DWORD dt)
 		float x, y;
 
 		mario->GetPosition(x, y);
-		roi = new CRoi();
-		if (mario->nx > 0)
+		if (mario->launching == true)
 		{
-			roi->AddAnimation(300);
-			roi->SetPosition(x - 30, y - 4);
+			dao = new CDao();
+			objects.push_back(dao);
+			mario->launching = false;
 		}
 		else
 		{
-			roi->AddAnimation(301);
-			roi->SetPosition(x - 90 , y - 4);
+			roi = new CRoi();
+			if (mario->nx > 0)
+			{
+				roi->AddAnimation(300);
+			}
+			else
+			{
+				roi->AddAnimation(301);
+			}
+			roi->animations[0]->isLastFrame = false;
+			roi->animations[0]->currentFrame = -1;
+
+			objects.push_back(roi);
 		}
-		roi->animations[0]->isLastFrame = false;
-		roi->animations[0]->currentFrame = -1;
-		
-		objects.push_back(roi);
 		mario->allowCreateWhip = false;
 	}
 	for (int i = 0; i < objects.size(); i++)
@@ -421,13 +465,11 @@ void Update(DWORD dt)
 	{
 		if ((objects[i]->type == GOOMBA_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
-	}
-	for (int i = 0; i < objects.size(); i++)
-	{
-		if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
+		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
+			objects.erase(objects.begin() + i);
+		else if ((objects[i]->type == DAO_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
 	}
-
 	// Update camera to follow mario
 	float cx, cy;
 	mario->GetPosition(cx, cy);

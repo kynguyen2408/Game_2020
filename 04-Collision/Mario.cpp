@@ -3,9 +3,8 @@
 
 #include "Mario.h"
 #include "Game.h"
-
 #include "Goomba.h"
-
+CMario* CMario::_instance = NULL;
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	// Calculate dx, dy 
@@ -47,6 +46,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		x += min_tx*dx + nx*0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
 		y += min_ty*dy + ny*0.4f;
 		jumping = false;
+		injured = false;
+		
 		if (nx!=0) vx = 0;
 		if (ny!=0) vy = 0;
 
@@ -60,15 +61,45 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				CGoomba *goomba = dynamic_cast<CGoomba *>(e->obj);
 
 				// jump on top >> kill Goomba and deflect a bit 
-				if (e->ny < 0)
+				if (e->ny != 0 /*&& e->nx < 0*/) //va tram ben tren ben trai
 				{
-					if (goomba->GetState()!= GOOMBA_STATE_DIE)
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
 					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						vy = -MARIO_JUMP_DEFLECT_SPEED;
+						CGameObject::nx = 1;
+						vx = -0.1;
+						SetState(MARIO_STATE_INJURED);
 					}
 				}
-				else if (e->nx != 0)
+				//else if (e->ny != 0 && e->nx > 0) //va tram ben tren ben phai
+				//{
+				//	if (goomba->GetState() != GOOMBA_STATE_DIE)
+				//	{
+				//		CGameObject::nx = -1;
+				//		vx = 0.1;
+				//		SetState(MARIO_STATE_INJURED);
+				//	}
+				//}
+				else if (e->nx < 0) //va tram vang ben trai
+				{
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = 1;
+						vx = -0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				else if (e->nx > 0) //va tram vang ben phai
+				{
+					if (goomba->GetState() != GOOMBA_STATE_DIE)
+					{
+						CGameObject::nx = -1;
+						vx = 0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				/*else if (e->nx != 0)
 				{
 					if (untouchable==0)
 					{
@@ -77,7 +108,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 								SetState(MARIO_STATE_DIE);
 						}
 					}
-				}
+				}*/
 			}
 		}
 	}
@@ -122,7 +153,7 @@ void CMario::Render()
 			else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
 		}
 	}
-	else if (vx > 0)
+	/*else if (vx > 0)
 	{
 			ani = MARIO_ANI_WALKING_RIGHT;
 			if (ny > 0)
@@ -134,16 +165,33 @@ void CMario::Render()
 			{	
 				ani = MARIO_ANI_HIT_RIGHT;
 			}
-	}
+	}*/
 	else
 	{
-		ani = MARIO_ANI_WALKING_LEFT;
-		if (ny > 0)
+		if (nx > 0)
 		{
-			if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
-			else ani = MARIO_ANI_JUMP_LEFT;
+			ani = MARIO_ANI_WALKING_RIGHT;
+			if (ny > 0)
+			{
+				if (hitting == true) ani = MARIO_ANI_HIT_RIGHT;
+				else ani = MARIO_ANI_JUMP_RIGHT;
+			}
+			else if (hitting == true)
+			{
+				ani = MARIO_ANI_HIT_RIGHT;
+			}
 		}
-		else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
+		else
+		{
+			ani = MARIO_ANI_WALKING_LEFT;
+			if (ny > 0)
+			{
+				if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
+				else ani = MARIO_ANI_JUMP_LEFT;
+			}
+			else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
+		}
+		
 	}
 
 	int alpha = 255;
@@ -237,9 +285,53 @@ void CMario::SetState(int state)
 				if (ny == 0) vx = 0;
 			}
 		}
-		
 		allowCreateWhip = true;
 		hitting = true;
+		break;
+	case MARIO_STATE_LAUNCH:
+		if (launching == false)
+		{
+			if (nx > 0)
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
+				}
+
+				else
+				{
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+
+				}
+			}
+			else
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
+				}
+				else
+				{
+					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+				}
+			}
+			launching = true; //cho phep phong dao
+			allowCreateWhip = true;
+			hitting = true;
+		}
+		break;
+	case MARIO_STATE_INJURED:
+		if (injured == false)
+		{
+			vy = -0.5;
+			injured = true;
+		}
 		break;
 	case MARIO_STATE_IDLE:
 		if (sitting)
@@ -261,8 +353,13 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	right = x + 40;
 	if (sitting)
 		bottom = y + 40;
-	else 
+	else
 		bottom = y + 60;
 	
 }
-
+CMario * CMario::GetInstance()
+{
+	if (_instance == NULL)
+		_instance = new CMario();
+	return _instance;
+}
