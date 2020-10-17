@@ -1,7 +1,9 @@
 #pragma once
+
 #include "GameObject.h"
-#include "Goomba.h"
 #include "Mario.h"
+
+#include "Goomba.h"
 #define ROI_BBOX_WIDTH 60
 #define ROI_BBOX_HEIGHT 20
 #define ROI_BBOX_HEIGHT_DIE 9
@@ -19,6 +21,7 @@ class CRoi: public CGameObject
 	CMario * mario;
 
 public:
+	CMario* mario;
 	CRoi();
 	void SetState(int state);
 

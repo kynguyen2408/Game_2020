@@ -45,6 +45,9 @@
     <ClInclude Include="Roi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Dao.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Nen.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -81,6 +84,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Roi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dao.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Nen.cpp">

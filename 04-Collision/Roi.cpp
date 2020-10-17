@@ -1,10 +1,14 @@
 #include "Roi.h"
+
+#include "Goomba.h"
+
 #include "Nen.h"
 #include "Mario.h"
 CRoi::CRoi() {
 	type = ROI_TYPE;
 	//IsThrowing = false;
 	dead = false;
+
 }
 void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
@@ -26,12 +30,18 @@ void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 
 void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
+	float x_mario, y_mario;
+	mario->GetInstance()->GetPosition(x_mario, y_mario);
+	if (mario->GetInstance()->nx > 0)
+		SetPosition(x_mario - 30, y_mario - 4);
+	else SetPosition(x_mario - 90, y_mario - 4);
 	// Calculate dx, dy 
 	
 	vector<LPGAMEOBJECT> coEvents;
 
 	coEvents.clear();
-
+	
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
 		LPGAMEOBJECT obj = coObjects->at(i);
@@ -61,6 +71,10 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CRoi::Render()
 {
 	int ani;
+
+	if (nx == 1) {
+		ani = ROI_ANI;
+	}
 	ani = mario->GetInstance()->currentRoi;
 	if (animations[ani]->isLastFrame) {
 		dead = true;
