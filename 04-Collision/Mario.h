@@ -2,7 +2,7 @@
 #include "GameObject.h"
 
 #define MARIO_X					50 
-#define MARIO_Y					338
+#define MARIO_Y					250
 #define MARIO_WALKING_SPEED		0.1f 
 //0.1f
 #define MARIO_JUMP_SPEED_Y		0.5f
@@ -49,17 +49,22 @@ class CMario : public CGameObject
 	int level;
 	int untouchable;
 	DWORD untouchable_start;
+	static CMario * __instance;
+
 public: 
 	boolean jumping = false;
 	boolean sitting = false;
 	boolean hitting = false;
 	boolean allowCreateWhip = false;
+	int currentRoi;
+
 	float mario_x, mario_y;
 	CMario() : CGameObject()
 	{
 		untouchable = 0;
 		mario_x = MARIO_X;
 		mario_y = MARIO_Y;
+		currentRoi = 0; 
 	}
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
@@ -68,4 +73,8 @@ public:
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+	void vaChamTuong(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
+	bool CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem);
+	int GetCurrentWeapons() { return currentRoi; }
+	static CMario * GetInstance();
 };

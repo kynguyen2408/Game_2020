@@ -3,87 +3,60 @@
 
 #include "Mario.h"
 #include "Game.h"
-
+#include "Nen.h"
 #include "Goomba.h"
+
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	// Calculate dx, dy 
-	CGameObject::Update(dt);
-	GetState(state);
-
 	// Simple fall down
-	vy += MARIO_GRAVITY*dt;
 
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
+	// Calculate dx, dy 
+
+	CGameObject::Update(dt);
+	vector<LPGAMEOBJECT> coEvents;
+	//vector<LPCOLLISIONEVENT> coEventsResult;
 
 	coEvents.clear();
 
 	// turn off collision when die 
-
-	CalcPotentialCollisions(coObjects, coEvents);
+	//CalcPotentialCollisions(coObjects, coEvents);
 
 	// reset untouchable timer if untouchable time has passed
-	if ( GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME) 
-	{
-		untouchable_start = 0;
-		untouchable = 0;
-	}
-
 	// No collision occured, proceed normally
-	if (coEvents.size()==0)
-	{
-		x += dx; 
-		y += dy;
+
+
+	//float min_tx, min_ty, nx = 0, ny;
+
+	//FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
+
+
+	// Collision logic with 
+	for (UINT i = 0; i < coObjects->size(); i++) {
+		LPGAMEOBJECT obj = coObjects->at(i);
+
+		if (IsCollisionAABB(GetRect(), coObjects->at(i)->GetRect()))
+		{
+			coEvents.push_back(coObjects->at(i));
+		}
 	}
+	if (coEvents.size() == 0) {}
 	else
 	{
-		float min_tx, min_ty, nx = 0, ny;
-
-		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-
-		// block 
-		x += min_tx*dx + nx*0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-		y += min_ty*dy + ny*0.4f;
-		jumping = false;
-		if (nx!=0) vx = 0;
-		if (ny!=0) vy = 0;
-
-		// Collision logic with Goombas
-		for (UINT i = 0; i < coEventsResult.size(); i++)
+		for (UINT i = 0; i < coEvents.size(); i++)
 		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-
-			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
-			{
-				CGoomba *goomba = dynamic_cast<CGoomba *>(e->obj);
-
-				// jump on top >> kill Goomba and deflect a bit 
-				if (e->ny < 0)
-				{
-					if (goomba->GetState()!= GOOMBA_STATE_DIE)
-					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						vy = -MARIO_JUMP_DEFLECT_SPEED;
-					}
-				}
-				else if (e->nx != 0)
-				{
-					if (untouchable==0)
-					{
-						if (goomba->GetState()!=GOOMBA_STATE_DIE)
-						{
-								SetState(MARIO_STATE_DIE);
-						}
-					}
-				}
+			if (coEvents.at(i)->type == NEN_TYPE && coEvents.at(i)->state == CANDLE_STATE_2) {
+				currentRoi = 1;
+				coEvents.at(i)->dead = true;
 			}
+			//if (coEvents.at(i)->type == GOOMBA_TYPE) {
+			//	coEvents.at(i)->dead = true;
+			//}
+
+
 		}
 	}
 
-	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 
 void CMario::Render()
@@ -266,3 +239,66 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 	
 }
 
+void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
+
+	CGameObject::Update(dt);
+	vy += MARIO_GRAVITY * dt;
+	coEvents.clear();
+
+	// turn off collision when die 
+	CalcPotentialCollisions(coObjects, coEvents);
+
+	// reset untouchable timer if untouchable time has passed
+	// No collision occured, proceed normally
+
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
+	}
+	else
+	{
+		// block 
+		float min_tx, min_ty, nx = 0, ny;
+
+		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
+		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
+		y += min_ty * dy + ny * 0.4f;
+
+		//jumping = false;
+
+		if (nx != 0) vx = 0;
+		if (ny != 0) vy = 0;
+
+	}
+	// clean up collision events
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+}
+
+bool CMario::CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem)
+{
+
+	for (UINT i = 0; i < listItem->size(); i++)
+	{
+		if (IsCollisionAABB(GetRect(), listItem->at(i)->GetRect()))
+		{
+			int idItem = listItem->at(i)->GetState(); // kiem tra xem tai day item do co id la gi ? 
+
+			switch (idItem)
+			{
+			//case HOLY_WATER:
+			//	SetCurrentWeapons(idItem);
+			}
+			return true;
+		}
+	}
+}
+
+CMario * CMario::GetInstance()
+{
+	if (__instance == NULL) __instance = new CMario();
+	return __instance;
+}

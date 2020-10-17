@@ -51,6 +51,7 @@ public:
 	int type;
 	bool dead;
 
+
 	DWORD dt; 
 
 	vector<LPANIMATION> animations;
@@ -75,6 +76,7 @@ public:
 		float &nx, 
 		float &ny);
 	RECT GetRect();
+	bool IsCollision(RECT rect1, RECT rect2);
 	bool IsCollisionAABB(RECT rect1, RECT rect2);
 	void AddAnimation(int aniId);
 
