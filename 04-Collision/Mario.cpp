@@ -5,37 +5,15 @@
 #include "Game.h"
 #include "Nen.h"
 #include "Goomba.h"
-CMario* CMario::_instance = NULL;
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
-	// Simple fall down
 
-	// Calculate dx, dy 
 
 	CGameObject::Update(dt);
-	vector<LPGAMEOBJECT> coEvents;
-	//vector<LPCOLLISIONEVENT> coEventsResult;
+	vector<LPGAMEOBJECT> coEventsStatic;
+	vector<LPCOLLISIONEVENT> coEventsResultStatic;
 
-	coEvents.clear();
-
-	// turn off collision when die 
-	//CalcPotentialCollisions(coObjects, coEvents);
-
-	// reset untouchable timer if untouchable time has passed
-	// No collision occured, proceed normally
-
-
-		// block 
-		x += min_tx*dx + nx*0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-		y += min_ty*dy + ny*0.4f;
-		jumping = false;
-		injured = false;
-		
-		if (nx!=0) vx = 0;
-		if (ny!=0) vy = 0;
-
-	//FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-
+	coEventsStatic.clear();
 
 	// Collision logic with 
 	for (UINT i = 0; i < coObjects->size(); i++) {
@@ -43,26 +21,54 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 		if (IsCollisionAABB(GetRect(), coObjects->at(i)->GetRect()))
 		{
-			coEvents.push_back(coObjects->at(i));
+			coEventsStatic.push_back(coObjects->at(i));
 		}
 	}
-	if (coEvents.size() == 0) {}
+
+
+	if (coEventsStatic.size() == 0)
+	{
+
+	}
 	else
 	{
-		for (UINT i = 0; i < coEvents.size(); i++)
+		for (UINT i = 0; i < coEventsStatic.size(); i++)
 		{
-			if (coEvents.at(i)->type == NEN_TYPE && coEvents.at(i)->state == CANDLE_STATE_2) {
+			if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_2) {
 				currentRoi = 1;
-				coEvents.at(i)->dead = true;
+				coEventsStatic.at(i)->dead = true;
 			}
-			//if (coEvents.at(i)->type == GOOMBA_TYPE) {
-			//	coEvents.at(i)->dead = true;
-			//}
+		}
+
+	}
 
 
-				// jump on top >> kill Goomba and deflect a bit 
+	vector<LPCOLLISIONEVENT> coEventMoving;
+	vector<LPCOLLISIONEVENT> coEventsResultMoving;
+
+	coEventMoving.clear();
+	CalcPotentialCollisions(coObjects, coEventMoving);
+	
+
+	if (coEventMoving.size() == 0)
+	{
+		
+	}
+	else
+	{
+	
+		float min_tx, min_ty, nx = 0, ny;
+
+		FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
+		for (UINT i = 0; i < coEventsResultMoving.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResultMoving[i];
+			if (dynamic_cast <CGoomba *> (e->obj))
+			{
+				CGoomba *goomba = dynamic_cast<CGoomba *> (e->obj);
 				if (e->ny != 0 /*&& e->nx < 0*/) //va tram ben tren ben trai
 				{
+
 					if (CGameObject::GetState() != MARIO_STATE_INJURED)
 					{
 						CGameObject::nx = 1;
@@ -112,8 +118,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			}
 		}
 	}
+	for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
 
 }
+
+	
+	
+
+
 
 void CMario::Render()
 {
@@ -355,12 +367,6 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		bottom = y + 60;
 	
 }
-CMario * CMario::GetInstance()
-{
-	if (_instance == NULL)
-		_instance = new CMario();
-	return _instance;
-}
 
 void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
@@ -385,6 +391,9 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else
 	{
 		// block 
+		jumping = false;
+		injured = false;
+
 		float min_tx, min_ty, nx = 0, ny;
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);

@@ -84,5 +84,4 @@ public:
 	void vaChamTuong(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	bool CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem);
 	int GetCurrentWeapons() { return currentRoi; }
-	static CMario * GetInstance();
 };

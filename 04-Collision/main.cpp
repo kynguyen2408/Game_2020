@@ -50,7 +50,7 @@
 #define ID_TEX_MISC 20
 #define ID_TEX_ROI 30
 #define ID_TEX_DAO 40
-#define ID_TEX_NEN 40
+#define ID_TEX_NEN 50
 
 
 CGame *game;
@@ -414,17 +414,17 @@ void LoadResources()
 		objects.push_back(brick);
 	}
 
-	// and Goombas 
-	for (int i = 0; i < 4; i++)
-	{
-		goomba = new CGoomba();
-		goomba->AddAnimation(800);
-		goomba->AddAnimation(801);
-		goomba->AddAnimation(802);
-		goomba->SetPosition(200 + i*60, 340);
-		goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
-		objects.push_back(goomba);
-	}
+	//// and Goombas 
+	//for (int i = 0; i < 4; i++)
+	//{
+	//	goomba = new CGoomba();
+	//	goomba->AddAnimation(800);
+	//	goomba->AddAnimation(801);
+	//	goomba->AddAnimation(802);
+	//	goomba->SetPosition(200 + i*60, 340);
+	//	goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
+	//	objects.push_back(goomba);
+	//}
 	//nen
 	Nen *nen = new Nen();
 	nen->AddAnimation(902);
@@ -458,16 +458,10 @@ void Update(DWORD dt)
 
 		mario->GetPosition(x, y);
 		if (mario->launching == true)
-		roi = new CRoi();
-		if (mario->nx > 0) // kiem tra simon o stay nao thi tao ra roi do
-		{
-			dao = new CDao();
-			objects.push_back(dao);
-			mario->launching = false;
-			roi->AddAnimation(300);
-			roi->AddAnimation(400);
-
-			roi->SetPosition(x - 30, y - 4);
+		{ 
+				dao = new CDao();
+				objects.push_back(dao);
+				mario->launching = false;
 		}
 		else
 		{
@@ -495,8 +489,6 @@ void Update(DWORD dt)
 	{
 		if ((objects[i]->type == GOOMBA_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
-		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
-
 		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
 			objects.erase(objects.begin() + i);
 		else if ((objects[i]->type == DAO_TYPE) && (objects[i]->dead == true))

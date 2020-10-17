@@ -18,7 +18,6 @@ class CRoi: public CGameObject
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();
-	CMario * mario;
 
 public:
 	CMario* mario;
