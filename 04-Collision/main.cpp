@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
 	INTRODUCTION TO GAME PROGRAMMING SE102
 	
 	SAMPLE 04 - COLLISION
@@ -34,7 +34,7 @@
 #include "Dao.h"
 #include "Map.h"
 #include "Nen.h"
-
+#include "Camera.h"
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
 #define MAIN_WINDOW_TITLE L"04 - Collision"
@@ -61,7 +61,7 @@ CRoi* roi;
 CDao* dao;
 Map* map;
 Nen* nen;
-
+CCamera* camera;
 vector<LPGAMEOBJECT> objects;
 CMario * CMario::__instance = NULL;
 class CSampleKeyHander: public CKeyEventHandler
@@ -165,8 +165,8 @@ void LoadResources()
 	map = Map::GetInstance();
 	map->LoadResources();
 
-	textures->Add(ID_TEX_MARIO, L"textures\\simon.png", D3DCOLOR_XRGB(176, 224, 248));
-	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(176, 224, 248));
+	textures->Add(ID_TEX_MARIO, L"textures\\simon.png", D3DCOLOR_XRGB(255, 0, 255));
+	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(ID_TEX_MISC, L"textures\\misc.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(ID_TEX_DAO, L"textures\\Sub_weapons.png", D3DCOLOR_XRGB(255, 0, 255));
@@ -188,15 +188,15 @@ void LoadResources()
 	sprites->Add(10003, 313, 200, 346, 260, texMario);
 	sprites->Add(10004, 260, 200, 284, 260, texMario);
 
-	sprites->Add(10005, 197, 200, 226, 245, texMario);
+	sprites->Add(10005, 197, 200, 226, 260, texMario); // ngồi quay mặt qua phải
 
-	sprites->Add(10011, 13, 2, 46, 64, texMario);
+	sprites->Add(10011, 13, 2, 46, 63, texMario);
 
-	sprites->Add(10012, 78, 2, 104, 64, texMario);
-	sprites->Add(10013, 135, 2, 168, 64, texMario);
-	sprites->Add(10014, 195, 2, 220, 64, texMario);
+	sprites->Add(10012, 78, 2, 104, 63, texMario);
+	sprites->Add(10013, 135, 2, 168, 63, texMario);
+	sprites->Add(10014, 195, 2, 220, 63, texMario);
 
-	sprites->Add(10015, 252, 2, 284, 46, texMario);
+	sprites->Add(10015, 252, 2, 284, 63, texMario); // ngồi quay mặt qua trái
 
 	// danh phai dung
 	sprites->Add(10006, 120, 202, 168, 261, texMario);
@@ -207,13 +207,13 @@ void LoadResources()
 	sprites->Add(10017, 373, 4, 405, 63, texMario);
 	sprites->Add(10018, 421, 6, 464, 63, texMario);
 	// danh phai ngoi`
-	sprites->Add(100061, 0, 265, 48, 311, texMario);
-	sprites->Add(100062, 437, 331, 468, 377, texMario);
-	sprites->Add(100063, 374, 333, 418, 377, texMario);
+	sprites->Add(100061, 0, 265, 48, 327, texMario);
+	sprites->Add(100062, 437, 331, 468, 393, texMario);
+	sprites->Add(100063, 374, 333, 418, 393, texMario);
 	// danh trai ngoi`
-	sprites->Add(100161, 432, 67, 480, 113, texMario);
-	sprites->Add(100162, 11, 133, 43, 179, texMario);
-	sprites->Add(100163, 60, 135, 105, 179, texMario);
+	sprites->Add(100161, 432, 67, 480, 129, texMario);
+	sprites->Add(100162, 11, 133, 43, 195, texMario);
+	sprites->Add(100163, 60, 135, 105, 195, texMario);
 
 	// phi dao phai dung
 	sprites->Add(10006, 120, 202, 168, 261, texMario);
@@ -236,6 +236,7 @@ void LoadResources()
 
 	LPDIRECT3DTEXTURE9 texRoi = textures->Get(ID_TEX_ROI);
 
+	sprites->Add(40004, 0, 204, 159, 272, texRoi);
 	sprites->Add(40003, 159, 204, 318, 272, texRoi);
 	sprites->Add(40002, 318, 204, 477, 272, texRoi);
 	sprites->Add(40001, 476, 204, 635, 272, texRoi);
@@ -244,10 +245,11 @@ void LoadResources()
 	sprites->Add(40012, 159, 0, 318, 68, texRoi);
 	sprites->Add(40013, 318, 0, 477, 68, texRoi);
 
-	LPDIRECT3DTEXTURE9 texDao = textures->Get(ID_TEX_DAO);
+	
 	LPDIRECT3DTEXTURE9 texNen = textures->Get(ID_TEX_NEN);
 	sprites->Add(60001, 400, 0, 432, 42, texNen); // nen
 
+	LPDIRECT3DTEXTURE9 texDao = textures->Get(ID_TEX_DAO);
 	sprites->Add(50001, 32, 64, 63, 81, texDao);  //dao phi qua phai
 
 	sprites->Add(50011, 65, 64, 95, 81, texDao); //dao phi qua trai
@@ -295,24 +297,28 @@ void LoadResources()
 	animations->Add(701, ani);
 
 	ani = new CAnimation(100); //dah phai dung
+	ani->Add(10001, 10);
 	ani->Add(10006);
 	ani->Add(10007);
 	ani->Add(10008);
 	animations->Add(1000, ani);
 
 	ani = new CAnimation(100); //dah trai dung
+	ani->Add(10011, 10);
 	ani->Add(10016);
 	ani->Add(10017);
 	ani->Add(10018);
 	animations->Add(1001, ani);
 
 	ani = new CAnimation(100); //dah phai ngoi
+	ani->Add(10005, 10);
 	ani->Add(100061);
 	ani->Add(100062);
 	ani->Add(100063);
 	animations->Add(1100, ani);
 
 	ani = new CAnimation(100); //dah trai ngoi
+	ani->Add(10015, 10);
 	ani->Add(100161);
 	ani->Add(100162);
 	ani->Add(100163);
@@ -338,17 +344,15 @@ void LoadResources()
 	ani->Add(30001);
 	animations->Add(802, ani);
 
-	ani = new CAnimation(100);	// brick
-	ani->Add(30001);
-	animations->Add(901, ani);
-
 	ani = new CAnimation(100);   //roi phai
+	ani->Add(40004, 10);	// frame trống
 	ani->Add(40001);
 	ani->Add(40002);
 	ani->Add(40003);
 	animations->Add(300, ani);
 
 	ani = new CAnimation(100);   //roi trai
+	ani->Add(40004, 10);
 	ani->Add(40011);
 	ani->Add(40012);
 	ani->Add(40013);
@@ -387,44 +391,27 @@ void LoadResources()
 	objects.push_back(mario);
 
 	
-	/*for (int i = 0; i < 5; i++)
-	{
-		CBrick *brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(100.0f + i*60.0f, 74.0f);
-		objects.push_back(brick);
-
-		brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(100.0f + i*60.0f, 90.0f);
-		objects.push_back(brick);
-
-		brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(84.0f + i*60.0f, 90.0f);
-		objects.push_back(brick);
-	}*/
 
 
 	for (int i = 0; i < 1; i++)
 	{
 		CBrick *brick = new CBrick();
-		brick->AddAnimation(901);
-		brick->SetPosition(0 + i*16.0f, 400);
+		//brick->AddAnimation(901);
+		brick->SetPosition(0 + i*16.0f, 384);
 		objects.push_back(brick);
 	}
 
 	//// and Goombas 
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	goomba = new CGoomba();
-	//	goomba->AddAnimation(800);
-	//	goomba->AddAnimation(801);
-	//	goomba->AddAnimation(802);
-	//	goomba->SetPosition(200 + i*60, 340);
-	//	goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
-	//	objects.push_back(goomba);
-	//}
+	for (int i = 0; i < 4; i++)
+	{
+		goomba = new CGoomba();
+		goomba->AddAnimation(800);
+		goomba->AddAnimation(801);
+		goomba->AddAnimation(802);
+		goomba->SetPosition(200 + i*60, 322);
+		goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
+		objects.push_back(goomba);
+	}
 	//nen
 	Nen *nen = new Nen();
 	nen->AddAnimation(902);
@@ -432,6 +419,8 @@ void LoadResources()
 	nen->SetPosition(400 + 0 * 16.0f, 320);
 	objects.push_back(nen);
 	
+	//tao camera
+	camera = camera->GetInstance();
 }
 
 /*
@@ -500,6 +489,9 @@ void Update(DWORD dt)
 
 	
 	mario->vaChamTuong(dt, &wallObjects);
+
+
+
 	// Update camera to follow mario
 	float cx, cy;
 	mario->GetPosition(cx, cy);
@@ -507,7 +499,9 @@ void Update(DWORD dt)
 	cx -= SCREEN_WIDTH / 2;
 	cy -= SCREEN_HEIGHT / 2;
 
-	CGame::GetInstance()->SetCamPos(cx,0.0f);
+	camera->x = cx;
+	camera->Update();
+	CGame::GetInstance()->SetCamPos(camera->x,0.0f);
 }
 
 /*
@@ -623,8 +617,7 @@ int Run()
 	return 1;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	game = CGame::GetInstance();

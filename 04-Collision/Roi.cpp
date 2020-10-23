@@ -13,17 +13,17 @@ CRoi::CRoi() {
 void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	if (mario->GetInstance()->currentRoi == 0) {
-		left = x + 50;
-		top = y + 4;
-		right = x + ROI_BBOX_WIDTH + 50;
-		bottom = y + ROI_BBOX_HEIGHT + 4;
+		left = x + 30;
+		top = y + 20;
+		right = x + ROI_BBOX_WIDTH + 70;
+		bottom = y + ROI_BBOX_HEIGHT + 12;
 	}
-	else if (mario->GetInstance()->currentRoi == 1) {
+	/*else if (mario->GetInstance()->currentRoi == 1) {
 		left = x + 50;
 		top = y + 4;
 		right = x + ROI_BBOX_WIDTH + 100;
 		bottom = y + ROI_BBOX_HEIGHT + 4;
-	}
+	}*/
 
 	
 }
@@ -32,10 +32,12 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 
 	float x_mario, y_mario;
+	float y_roi = 0;
+	if (mario->GetInstance()->ny < 0) y_roi = 12;
 	mario->GetInstance()->GetPosition(x_mario, y_mario);
 	if (mario->GetInstance()->nx > 0)
-		SetPosition(x_mario - 30, y_mario - 4);
-	else SetPosition(x_mario - 90, y_mario - 4);
+		SetPosition(x_mario - 30, y_mario - 4 + y_roi);
+	else SetPosition(x_mario - 90, y_mario - 4 + y_roi);
 	// Calculate dx, dy 
 	
 	vector<LPGAMEOBJECT> coEvents;
@@ -76,7 +78,7 @@ void CRoi::Render()
 		ani = ROI_ANI;
 	}
 	ani = mario->GetInstance()->currentRoi;
-	if (animations[ani]->isLastFrame) {
+	if (animations[ani]->currentFrame == 3) {
 		dead = true;
 	}
 	
