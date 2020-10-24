@@ -38,6 +38,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				currentRoi = 1;
 				coEventsStatic.at(i)->dead = true;
 			}
+			else if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_3) {
+				currentRoi = 2;
+				coEventsStatic.at(i)->dead = true;
+			}
 		}
 
 	}

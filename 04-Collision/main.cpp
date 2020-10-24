@@ -46,11 +46,12 @@
 #define MAX_FRAME_RATE 120
 
 #define ID_TEX_MARIO 0
-#define ID_TEX_ENEMY 10
+#define ID_TEX_ENEMY 80	
 #define ID_TEX_MISC 20
 #define ID_TEX_ROI 30
 #define ID_TEX_DAO 40
 #define ID_TEX_NEN 50
+#define ID_TEX_ITEMS 60
 
 
 CGame *game;
@@ -165,252 +166,45 @@ void LoadResources()
 	map = Map::GetInstance();
 	map->LoadResources();
 
-	textures->Add(ID_TEX_MARIO, L"textures\\simon.png", D3DCOLOR_XRGB(176, 224, 248));
-	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(176, 224, 248));
-	textures->Add(ID_TEX_MISC, L"textures\\misc.png", D3DCOLOR_XRGB(176, 224, 248));
-	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(255, 0, 255));
-	textures->Add(ID_TEX_DAO, L"textures\\Sub_weapons.png", D3DCOLOR_XRGB(255, 0, 255));
-	textures->Add(ID_TEX_NEN, L"textures\\Static_Obj.png", D3DCOLOR_XRGB(176, 224, 24));
-
-	textures->Add(99, L"textures\\title1.png", D3DCOLOR_XRGB(255, 255, 255));
-
-	textures->Add(ID_TEX_BBOX, L"textures\\bbox.png", D3DCOLOR_XRGB(255, 255, 255));
-
 
 	CSprites * sprites = CSprites::GetInstance();
 	CAnimations * animations = CAnimations::GetInstance();
 	
-	LPDIRECT3DTEXTURE9 texMario = textures->Get(ID_TEX_MARIO);
-
-	sprites->Add(10001, 434, 200, 469, 260, texMario);
-
-	sprites->Add(10002, 375, 200, 401, 260, texMario);
-	sprites->Add(10003, 313, 200, 346, 260, texMario);
-	sprites->Add(10004, 260, 200, 284, 260, texMario);
-
-	sprites->Add(10005, 197, 200, 226, 245, texMario);
-
-	sprites->Add(10011, 13, 2, 46, 64, texMario);
-
-	sprites->Add(10012, 78, 2, 104, 64, texMario);
-	sprites->Add(10013, 135, 2, 168, 64, texMario);
-	sprites->Add(10014, 195, 2, 220, 64, texMario);
-
-	sprites->Add(10015, 252, 2, 284, 46, texMario);
-
-	// danh phai dung
-	sprites->Add(10006, 120, 202, 168, 261, texMario);
-	sprites->Add(10007, 75, 202, 108, 261, texMario);
-	sprites->Add(10008, 16, 204, 58, 261, texMario);
-	// danh trai dung
-	sprites->Add(10016, 312, 4, 359, 63, texMario);
-	sprites->Add(10017, 373, 4, 405, 63, texMario);
-	sprites->Add(10018, 421, 6, 464, 63, texMario);
-	// danh phai ngoi`
-	sprites->Add(100061, 0, 265, 48, 311, texMario);
-	sprites->Add(100062, 437, 331, 468, 377, texMario);
-	sprites->Add(100063, 374, 333, 418, 377, texMario);
-	// danh trai ngoi`
-	sprites->Add(100161, 432, 67, 480, 113, texMario);
-	sprites->Add(100162, 11, 133, 43, 179, texMario);
-	sprites->Add(100163, 60, 135, 105, 179, texMario);
-
-	// phi dao phai dung
-	sprites->Add(10006, 120, 202, 168, 261, texMario);
-
-	// phi dao trai dung
-	sprites->Add(10016, 312, 4, 359, 63, texMario);
-
-
-	LPDIRECT3DTEXTURE9 texEnemy = textures->Get(ID_TEX_ENEMY);
-	sprites->Add(20001, 255, 0, 288, 64, texEnemy);
-	sprites->Add(20002, 292, 0, 324, 64, texEnemy);
-
-	sprites->Add(20011, 362, 0, 392, 64, texEnemy);
-	sprites->Add(20012, 324, 0, 356, 64, texEnemy);
-
-	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
-
-	LPDIRECT3DTEXTURE9 texMisc = textures->Get(ID_TEX_MISC);
-	sprites->Add(30001, 408, 225, 424, 241, texMisc);
-
-	LPDIRECT3DTEXTURE9 texRoi = textures->Get(ID_TEX_ROI);
-
-	sprites->Add(40003, 159, 204, 318, 272, texRoi);
-	sprites->Add(40002, 318, 204, 477, 272, texRoi);
-	sprites->Add(40001, 476, 204, 635, 272, texRoi);
-
-	sprites->Add(40011, 0, 0, 159, 68, texRoi);
-	sprites->Add(40012, 159, 0, 318, 68, texRoi);
-	sprites->Add(40013, 318, 0, 477, 68, texRoi);
-
-	LPDIRECT3DTEXTURE9 texDao = textures->Get(ID_TEX_DAO);
-	LPDIRECT3DTEXTURE9 texNen = textures->Get(ID_TEX_NEN);
-	sprites->Add(60001, 400, 0, 432, 42, texNen); // nen
-
-	sprites->Add(50001, 32, 64, 63, 81, texDao);  //dao phi qua phai
-
-	sprites->Add(50011, 65, 64, 95, 81, texDao); //dao phi qua trai
-	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
-
-	LPANIMATION ani;
-
-	ani = new CAnimation(100);
-	ani->Add(10001);
-	animations->Add(400, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10011);
-	animations->Add(401, ani);
-
-
-	ani = new CAnimation(100);
-	ani->Add(10001);
-	ani->Add(10002);
-	ani->Add(10003);
-	ani->Add(10004);
-	animations->Add(500, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10011);
-	ani->Add(10012);
-	ani->Add(10013);
-	ani->Add(10014);
-	animations->Add(501, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10005);
-	animations->Add(600, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10015);
-	animations->Add(601, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10005);
-	animations->Add(700, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(10015);
-	animations->Add(701, ani);
-
-	ani = new CAnimation(100); //dah phai dung
-	ani->Add(10006);
-	ani->Add(10007);
-	ani->Add(10008);
-	animations->Add(1000, ani);
-
-	ani = new CAnimation(100); //dah trai dung
-	ani->Add(10016);
-	ani->Add(10017);
-	ani->Add(10018);
-	animations->Add(1001, ani);
-
-	ani = new CAnimation(100); //dah phai ngoi
-	ani->Add(100061);
-	ani->Add(100062);
-	ani->Add(100063);
-	animations->Add(1100, ani);
-
-	ani = new CAnimation(100); //dah trai ngoi
-	ani->Add(100161);
-	ani->Add(100162);
-	ani->Add(100163);
-	animations->Add(1101, ani);
-
-	//ani = new CAnimation(100);		// Mario die
-	//ani->Add(10099);
-	//animations->Add(599, ani);
-
-	
-
-	ani = new CAnimation(300);		// Goomba walk
-	ani->Add(20001);
-	ani->Add(20002);
-	animations->Add(801, ani);
-
-	ani = new CAnimation(100);
-	ani->Add(20011);
-	ani->Add(20012);
-	animations->Add(800, ani);
-
-	ani = new CAnimation(1000);		// Goomba dead
-	ani->Add(30001);
-	animations->Add(802, ani);
-
-	ani = new CAnimation(100);	// brick
-	ani->Add(30001);
-	animations->Add(901, ani);
-
-	ani = new CAnimation(100);   //roi phai
-	ani->Add(40001);
-	ani->Add(40002);
-	ani->Add(40003);
-	animations->Add(300, ani);
-
-	ani = new CAnimation(100);   //roi trai
-	ani->Add(40011);
-	ani->Add(40012);
-	ani->Add(40013);
-	animations->Add(301, ani);
-
-	ani = new CAnimation(100);   //dao phai
-	ani->Add(50001);
-	animations->Add(3000, ani);
-
-	ani = new CAnimation(100);   //dao trai
-	ani->Add(50011);
-	animations->Add(3001, ani);
-
-	mario = mario->GetInstance();
-	ani = new CAnimation(100);		// nen
-	ani->Add(60001);
-	animations->Add(902, ani);
-
+	textures->LoadResources();
+	sprites->LoadResources();
+	animations->LoadResources();
 
 	mario = mario->GetInstance();
 	mario->AddAnimation(400);		// idle right
 	mario->AddAnimation(401);		// idle left
+
 	mario->AddAnimation(500);		// walk right
 	mario->AddAnimation(501);		// walk left
-	mario->AddAnimation(600);      // jump right
-	mario->AddAnimation(601);		// jump left
-	mario->AddAnimation(700);      // sit right
-	mario->AddAnimation(701);		// sit left
-	mario->AddAnimation(1000);      //hit right
-	mario->AddAnimation(1001);      //hit left
-	mario->AddAnimation(1100);      //hit right
-	mario->AddAnimation(1101);      //hit left
+
+	mario->AddAnimation(509);      // jump right
+	mario->AddAnimation(508);		// jump left
+
+	mario->AddAnimation(510);      // sit right
+	mario->AddAnimation(511);		// sit left
+
+	mario->AddAnimation(513);      //hit right
+	mario->AddAnimation(512);      //hit left
+
+	mario->AddAnimation(514);      //hit sit right
+	mario->AddAnimation(515);      //hit sit left
 	//mario->AddAnimation(599);		// die
 	
 	mario->SetPosition(mario->mario_x, mario->mario_y);
 	objects.push_back(mario);
 
 	
-	/*for (int i = 0; i < 5; i++)
-	{
-		CBrick *brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(100.0f + i*60.0f, 74.0f);
-		objects.push_back(brick);
-
-		brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(100.0f + i*60.0f, 90.0f);
-		objects.push_back(brick);
-
-		brick = new CBrick();
-		brick->AddAnimation(601);
-		brick->SetPosition(84.0f + i*60.0f, 90.0f);
-		objects.push_back(brick);
-	}*/
+	
 
 
 	for (int i = 0; i < 1; i++)
 	{
 		CBrick *brick = new CBrick();
-		brick->AddAnimation(901);
-		brick->SetPosition(0 + i*16.0f, 400);
+		brick->SetPosition(0 + i*16.0f, 384);
 		objects.push_back(brick);
 	}
 
@@ -418,19 +212,23 @@ void LoadResources()
 	//for (int i = 0; i < 4; i++)
 	//{
 	//	goomba = new CGoomba();
-	//	goomba->AddAnimation(800);
-	//	goomba->AddAnimation(801);
-	//	goomba->AddAnimation(802);
+	//	goomba->AddAnimation(902); // trai
+	//	goomba->AddAnimation(901); // phai 
 	//	goomba->SetPosition(200 + i*60, 340);
 	//	goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
 	//	objects.push_back(goomba);
 	//}
 	//nen
 	Nen *nen = new Nen();
-	nen->AddAnimation(902);
-	nen->AddAnimation(400);
+	nen->setTypeItems(NEN_ANI_ITEM_WHIP);
 	nen->SetPosition(400 + 0 * 16.0f, 320);
 	objects.push_back(nen);
+
+	Nen *nen2 = new Nen();
+	nen2->setTypeItems(NEN_ANI_ITEM_AXE);
+	nen2->SetPosition(700 + 0 * 16.0f, 320);
+	objects.push_back(nen2);
+
 	
 }
 
@@ -468,22 +266,31 @@ void Update(DWORD dt)
 			roi = new CRoi();
 			if (mario->nx > 0)
 			{
-				roi->AddAnimation(300);
+				roi->AddAnimation(603); // roi phai
+				roi->AddAnimation(604); // roi phai 2
+				roi->AddAnimation(605); // roi phai 3
 			}
 			else
 			{
-				roi->AddAnimation(301);
+				roi->AddAnimation(600); // roi trai
+				roi->AddAnimation(601); // roi trai 2
+				roi->AddAnimation(602); // roi trai 3
 			}
 			roi->animations[0]->isLastFrame = false;
 			roi->animations[0]->currentFrame = -1;
-
 			objects.push_back(roi);
 		}
 		mario->allowCreateWhip = false;
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
-		objects[i]->Update(dt,&coObjects);
+		if (objects[i]->type == NEN_TYPE) {
+			objects[i]->Update(dt, &wallObjects);
+		}
+		else {
+			objects[i]->Update(dt, &coObjects);
+
+		}
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
