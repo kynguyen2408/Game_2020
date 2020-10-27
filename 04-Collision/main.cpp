@@ -1,4 +1,4 @@
-/* =============================================================
+﻿/* =============================================================
 	INTRODUCTION TO GAME PROGRAMMING SE102
 	
 	SAMPLE 04 - COLLISION
@@ -32,9 +32,11 @@
 #include "Goomba.h"
 #include "Roi.h"
 #include "Dao.h"
+#include "Riu.h"
+#include "Fire.h"
 #include "Map.h"
 #include "Nen.h"
-
+#include "Camera.h"
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
 #define MAIN_WINDOW_TITLE L"04 - Collision"
@@ -60,9 +62,11 @@ CMario *mario;
 CGoomba *goomba;
 CRoi* roi;
 CDao* dao;
+CRiu* riu;
+CFire* fire;
 Map* map;
 Nen* nen;
-
+CCamera* camera;
 vector<LPGAMEOBJECT> objects;
 CMario * CMario::__instance = NULL;
 class CSampleKeyHander: public CKeyEventHandler
@@ -97,6 +101,16 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 			if (mario->hitting == false)
 				mario->SetState(MARIO_STATE_HIT);
 		}
+		break;
+	case DIK_S:
+		DebugOut(L"[INFO] S: %d\n", KeyCode);
+		if (mario->hitting == false)
+			mario->SetState(MARIO_STATE_THROW);
+		break;
+	case DIK_D:
+		DebugOut(L"[INFO] D: %d\n", KeyCode);
+		if (mario->hitting == false)
+			mario->SetState(MARIO_STATE_BURN);
 		break;
 	}
 }
@@ -230,6 +244,8 @@ void LoadResources()
 	objects.push_back(nen2);
 
 	
+	//tao camera
+	camera = camera->GetInstance();
 }
 
 /*
@@ -260,6 +276,18 @@ void Update(DWORD dt)
 				dao = new CDao();
 				objects.push_back(dao);
 				mario->launching = false;
+		}
+		else if (mario->throwing == true)
+		{
+			riu = new CRiu();
+			objects.push_back(riu);
+			mario->throwing = false;
+		}
+		else if (mario->burning == true)
+		{
+			fire = new CFire();
+			objects.push_back(fire);
+			mario->burning = false;
 		}
 		else
 		{
@@ -294,19 +322,18 @@ void Update(DWORD dt)
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
-		if ((objects[i]->type == GOOMBA_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-		else if ((objects[i]->type == DAO_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-
-		else if ((objects[i]->type == NEN_TYPE) && (objects[i]->dead == true))
+		if (objects[i]->dead == true)
 			objects.erase(objects.begin() + i);
 	}
+	
 
 	
 	mario->vaChamTuong(dt, &wallObjects);
+	if(fire != NULL)
+		fire->VaChamDat(dt, &wallObjects);
+
+
+
 	// Update camera to follow mario
 	float cx, cy;
 	mario->GetPosition(cx, cy);
@@ -314,7 +341,9 @@ void Update(DWORD dt)
 	cx -= SCREEN_WIDTH / 2;
 	cy -= SCREEN_HEIGHT / 2;
 
-	CGame::GetInstance()->SetCamPos(cx,0.0f);
+	camera->x = cx;
+	camera->Update();
+	CGame::GetInstance()->SetCamPos(camera->x,0.0f);
 }
 
 /*
@@ -430,8 +459,7 @@ int Run()
 	return 1;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow){
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	game = CGame::GetInstance();

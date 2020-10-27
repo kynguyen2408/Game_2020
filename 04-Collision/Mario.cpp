@@ -15,27 +15,28 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	coEventsStatic.clear();
 
-	// Collision logic with 
+	// va cham voi vat dung yen 
 	for (UINT i = 0; i < coObjects->size(); i++) {
 		LPGAMEOBJECT obj = coObjects->at(i);
-
+		// kiem tra 2 hinh de nhau hay k 
 		if (IsCollisionAABB(GetRect(), coObjects->at(i)->GetRect()))
 		{
 			coEventsStatic.push_back(coObjects->at(i));
 		}
 	}
 
-
+	// neu co va cham 
 	if (coEventsStatic.size() == 0)
 	{
 
 	}
+	//k vo va cham 
 	else
 	{
 		for (UINT i = 0; i < coEventsStatic.size(); i++)
 		{
 			if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_2) {
-				currentRoi = 1;
+				//currentRoi = 1;
 				coEventsStatic.at(i)->dead = true;
 			}
 			else if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_3) {
@@ -46,7 +47,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 
 	}
 
-
+	//xet vat di chuyen 
 	vector<LPCOLLISIONEVENT> coEventMoving;
 	vector<LPCOLLISIONEVENT> coEventsResultMoving;
 
@@ -70,25 +71,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			if (dynamic_cast <CGoomba *> (e->obj))
 			{
 				CGoomba *goomba = dynamic_cast<CGoomba *> (e->obj);
-				if (e->ny != 0 /*&& e->nx < 0*/) //va tram ben tren ben trai
+				if (e->ny != 0) //va tram ben tren ben trai
 				{
-
 					if (CGameObject::GetState() != MARIO_STATE_INJURED)
 					{
-						CGameObject::nx = 1;
-						vx = -0.1;
+						CGameObject::nx = -CGameObject::nx;
+						if (vx <= 0)
+							vx = -0.1;
+						else
+							vx = 0.1;
 						SetState(MARIO_STATE_INJURED);
 					}
 				}
-				//else if (e->ny != 0 && e->nx > 0) //va tram ben tren ben phai
-				//{
-				//	if (goomba->GetState() != GOOMBA_STATE_DIE)
-				//	{
-				//		CGameObject::nx = -1;
-				//		vx = 0.1;
-				//		SetState(MARIO_STATE_INJURED);
-				//	}
-				//}
 				else if (e->nx < 0) //va tram vang ben trai
 				{
 					if (CGameObject::GetState() != MARIO_STATE_INJURED)
@@ -210,8 +204,18 @@ void CMario::Render()
 
 	int alpha = 255;
 	if (untouchable) alpha = 128;
-	if (animations[ani]->isLastFrame == true)
+	if (hitting && animations[ani]->isLastFrame == true)
+	{
 		hitting = false;
+		if (ani == MARIO_ANI_HIT_RIGHT)
+			ani = MARIO_ANI_IDLE_RIGHT;
+		else if (ani == MARIO_ANI_HIT_LEFT)
+			ani = MARIO_ANI_IDLE_LEFT;
+		else if (ani == MARIO_ANI_HIT_SIT_RIGHT)
+			ani = MARIO_ANI_SIT_RIGHT;
+		else if (ani == MARIO_ANI_HIT_SIT_LEFT)
+			ani = MARIO_ANI_SIT_LEFT;
+	}
 	animations[ani]->Render(x, y, alpha);
 
 	RenderBoundingBox();
@@ -224,20 +228,12 @@ void CMario::SetState(int state)
 	switch (state)
 	{
 	case MARIO_STATE_WALKING_RIGHT:
-		if (sitting)
-		{
-			y = y - 20;
-		}
 		sitting = false;
 		vx = MARIO_WALKING_SPEED;
 		nx = 1;
 		ny = 0;
 		break;
 	case MARIO_STATE_WALKING_LEFT:
-		if (sitting)
-		{
-			y = y - 20;
-		}
 		sitting = false;
 		vx = -MARIO_WALKING_SPEED;
 		nx = -1;
@@ -340,6 +336,82 @@ void CMario::SetState(int state)
 			hitting = true;
 		}
 		break;
+	case MARIO_STATE_THROW:
+		if (throwing == false)
+		{
+			if (nx > 0)
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
+				}
+
+				else
+				{
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+
+				}
+			}
+			else
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
+				}
+				else
+				{
+					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+				}
+			}
+			throwing = true; //cho phep nem riu
+			allowCreateWhip = true;
+			hitting = true;
+		}
+		break;
+	case MARIO_STATE_BURN:
+		if (throwing == false)
+		{
+			if (nx > 0)
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
+				}
+
+				else
+				{
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+
+				}
+			}
+			else
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
+				}
+				else
+				{
+					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+				}
+			}
+			burning = true; //cho phep nem riu
+			allowCreateWhip = true;
+			hitting = true;
+		}
+		break;
 	case MARIO_STATE_INJURED:
 		if (injured == false)
 		{
@@ -348,10 +420,6 @@ void CMario::SetState(int state)
 		}
 		break;
 	case MARIO_STATE_IDLE:
-		if (sitting)
-		{
-			y = y -20;
-		}
 		sitting = false;
 		vx = 0;
 		ny = 0;
@@ -363,12 +431,11 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 {
 	
 	left = x;
-	top = y;
-	right = x + 40;
-	if (sitting)
-		bottom = y + 40;
-	else
-		bottom = y + 60;
+	if (sitting || (jumping && !hitting))
+		top = y + 17;
+	else top = y;
+	right = x + 32;
+	bottom = y + 60;
 	
 }
 
@@ -384,9 +451,8 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// turn off collision when die 
 	CalcPotentialCollisions(coObjects, coEvents);
 
-	// reset untouchable timer if untouchable time has passed
-	// No collision occured, proceed normally
-
+	
+	
 	if (coEvents.size() == 0)
 	{
 		x += dx;
@@ -404,7 +470,6 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
 		y += min_ty * dy + ny * 0.4f;
 
-		//jumping = false;
 
 		if (nx != 0) vx = 0;
 		if (ny != 0) vy = 0;
