@@ -32,6 +32,8 @@
 #include "Goomba.h"
 #include "Roi.h"
 #include "Dao.h"
+#include "Riu.h"
+#include "Fire.h"
 #include "Map.h"
 #include "Nen.h"
 #include "Camera.h"
@@ -59,6 +61,8 @@ CMario *mario;
 CGoomba *goomba;
 CRoi* roi;
 CDao* dao;
+CRiu* riu;
+CFire* fire;
 Map* map;
 Nen* nen;
 CCamera* camera;
@@ -96,6 +100,16 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 			if (mario->hitting == false)
 				mario->SetState(MARIO_STATE_HIT);
 		}
+		break;
+	case DIK_S:
+		DebugOut(L"[INFO] S: %d\n", KeyCode);
+		if (mario->hitting == false)
+			mario->SetState(MARIO_STATE_THROW);
+		break;
+	case DIK_D:
+		DebugOut(L"[INFO] D: %d\n", KeyCode);
+		if (mario->hitting == false)
+			mario->SetState(MARIO_STATE_BURN);
 		break;
 	}
 }
@@ -253,7 +267,19 @@ void LoadResources()
 	sprites->Add(50001, 32, 64, 63, 81, texDao);  //dao phi qua phai
 
 	sprites->Add(50011, 65, 64, 95, 81, texDao); //dao phi qua trai
-	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
+
+	//riu phai
+	sprites->Add(50002, 62, 0, 91, 27, texDao); 
+	sprites->Add(50003, 92, 0, 121, 27, texDao);
+	//riu trai
+	sprites->Add(50012, 32, 0, 61, 27, texDao);
+	sprites->Add(50013, 122, 0, 151, 27, texDao);
+
+	//lua
+	sprites->Add(50004, 8, 100, 23, 115, texDao); //binh`
+	sprites->Add(50005, 42, 98, 53, 121, texDao); //lua nho
+	sprites->Add(50006, 64, 96, 95, 121, texDao); //lua lon
+
 
 	LPANIMATION ani;
 
@@ -264,7 +290,6 @@ void LoadResources()
 	ani = new CAnimation(100);
 	ani->Add(10011);
 	animations->Add(401, ani);
-
 
 	ani = new CAnimation(100);
 	ani->Add(10001);
@@ -366,7 +391,25 @@ void LoadResources()
 	ani->Add(50011);
 	animations->Add(3001, ani);
 
-	mario = mario->GetInstance();
+	ani = new CAnimation(100);   //riu phai
+	ani->Add(50002);
+	ani->Add(50003);
+	animations->Add(4000, ani);
+
+	ani = new CAnimation(100);   //riu phai
+	ani->Add(50012);
+	ani->Add(50013);
+	animations->Add(4001, ani);
+
+	ani = new CAnimation(300); //lua binh`
+	ani->Add(50004);
+	animations->Add(5000, ani);
+
+	ani = new CAnimation(300);   //lua chay
+	ani->Add(50005);
+	ani->Add(50006);
+	animations->Add(5001, ani);
+
 	ani = new CAnimation(100);		// nen
 	ani->Add(60001);
 	animations->Add(902, ani);
@@ -396,7 +439,6 @@ void LoadResources()
 	for (int i = 0; i < 1; i++)
 	{
 		CBrick *brick = new CBrick();
-		//brick->AddAnimation(901);
 		brick->SetPosition(0 + i*16.0f, 384);
 		objects.push_back(brick);
 	}
@@ -452,6 +494,18 @@ void Update(DWORD dt)
 				objects.push_back(dao);
 				mario->launching = false;
 		}
+		else if (mario->throwing == true)
+		{
+			riu = new CRiu();
+			objects.push_back(riu);
+			mario->throwing = false;
+		}
+		else if (mario->burning == true)
+		{
+			fire = new CFire();
+			objects.push_back(fire);
+			mario->burning = false;
+		}
 		else
 		{
 			roi = new CRoi();
@@ -476,19 +530,15 @@ void Update(DWORD dt)
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
-		if ((objects[i]->type == GOOMBA_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-		else if ((objects[i]->type == ROI_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-		else if ((objects[i]->type == DAO_TYPE) && (objects[i]->dead == true))
-			objects.erase(objects.begin() + i);
-
-		else if ((objects[i]->type == NEN_TYPE) && (objects[i]->dead == true))
+		if (objects[i]->dead == true)
 			objects.erase(objects.begin() + i);
 	}
+	
 
 	
 	mario->vaChamTuong(dt, &wallObjects);
+	if(fire != NULL)
+		fire->VaChamDat(dt, &wallObjects);
 
 
 

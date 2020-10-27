@@ -19,8 +19,10 @@
 #define MARIO_STATE_SIT_RIGHT		600
 #define MARIO_STATE_HIT				700
 #define MARIO_STATE_LAUNCH			800
-#define MARIO_STATE_INJURED			900
-#define MARIO_STATE_DIE				1000
+#define MARIO_STATE_THROW			900
+#define MARIO_STATE_BURN			1000
+#define MARIO_STATE_INJURED			1100
+#define MARIO_STATE_DIE				1200
 
 #define MARIO_ANI_IDLE_RIGHT		0
 #define MARIO_ANI_IDLE_LEFT			1
@@ -36,8 +38,10 @@
 #define MARIO_ANI_HIT_SIT_LEFT		11
 #define MARIO_ANI_LAUNCH_RIGHT		12
 #define MARIO_ANI_LAUNCH_LEFT		13
+#define MARIO_ANI_THROW_RIGHT		14
+#define MARIO_ANI_THROW_LEFT		15
 
-#define MARIO_ANI_DIE				14
+#define MARIO_ANI_DIE				16
 
 #define	MARIO_TYPE 11
 
@@ -62,6 +66,8 @@ public:
 	boolean sitting = false;
 	boolean hitting = false;
 	boolean launching = false;
+	boolean throwing = false;
+	boolean burning = false;
 	boolean injured = false;
 	boolean allowCreateWhip = false;
 	int currentRoi;

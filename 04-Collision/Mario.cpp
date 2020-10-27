@@ -332,6 +332,82 @@ void CMario::SetState(int state)
 			hitting = true;
 		}
 		break;
+	case MARIO_STATE_THROW:
+		if (throwing == false)
+		{
+			if (nx > 0)
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
+				}
+
+				else
+				{
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+
+				}
+			}
+			else
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
+				}
+				else
+				{
+					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+				}
+			}
+			throwing = true; //cho phep nem riu
+			allowCreateWhip = true;
+			hitting = true;
+		}
+		break;
+	case MARIO_STATE_BURN:
+		if (throwing == false)
+		{
+			if (nx > 0)
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
+				}
+
+				else
+				{
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+
+				}
+			}
+			else
+			{
+				if (ny < 0)
+				{
+					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
+				}
+				else
+				{
+					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
+				}
+			}
+			burning = true; //cho phep nem riu
+			allowCreateWhip = true;
+			hitting = true;
+		}
+		break;
 	case MARIO_STATE_INJURED:
 		if (injured == false)
 		{
@@ -372,6 +448,7 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CalcPotentialCollisions(coObjects, coEvents);
 
 	
+	
 	if (coEvents.size() == 0)
 	{
 		x += dx;
@@ -389,7 +466,6 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
 		y += min_ty * dy + ny * 0.4f;
 
-		//jumping = false;
 
 		if (nx != 0) vx = 0;
 		if (ny != 0) vy = 0;

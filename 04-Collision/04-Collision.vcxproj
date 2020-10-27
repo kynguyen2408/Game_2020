@@ -126,12 +126,14 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Dao.h" />
     <ClInclude Include="debug.h" />
+    <ClInclude Include="Fire.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Goomba.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="Mario.h" />
     <ClInclude Include="Nen.h" />
+    <ClInclude Include="Riu.h" />
     <ClInclude Include="Roi.h" />
     <ClInclude Include="Sprites.h" />
     <ClInclude Include="Textures.h" />
@@ -141,6 +143,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Dao.cpp" />
     <ClCompile Include="debug.cpp" />
+    <ClCompile Include="Fire.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Goomba.cpp" />
@@ -148,6 +151,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Mario.cpp" />
     <ClCompile Include="Nen.cpp" />
+    <ClCompile Include="Riu.cpp" />
     <ClCompile Include="Roi.cpp" />
     <ClCompile Include="Sprites.cpp" />
     <ClCompile Include="Textures.cpp" />
