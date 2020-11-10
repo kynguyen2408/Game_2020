@@ -7,8 +7,8 @@ CFire::CFire() {
 	float x_mario, y_mario;
 	mario->GetInstance()->GetPosition(x_mario, y_mario);
 	SetPosition(x_mario, y_mario);
-	AddAnimation(5000);
-	AddAnimation(5001);
+	AddAnimation(809);
+	AddAnimation(810);
 	if (mario->GetInstance()->nx > 0)
 	{
 		vx = FIRE_SPEED;

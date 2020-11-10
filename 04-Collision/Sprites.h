@@ -64,8 +64,9 @@ class CAnimation
 	
 	int defaultTime;
 	
-	vector<LPANIMATION_FRAME> frames;
+	
 public:
+	vector<LPANIMATION_FRAME> frames;
 	bool isLastFrame;
 	int currentFrame;
 	CAnimation(int defaultTime) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; isLastFrame = false; }
@@ -85,7 +86,7 @@ public:
 	void Add(int id, LPANIMATION ani);
 	LPANIMATION Get(int id);
 	void LoadResources();
-
+	void push(int id, LPANIMATION ani);
 	static CAnimations * GetInstance();
 };
 

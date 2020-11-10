@@ -1,17 +1,22 @@
 #pragma once
 #pragma once
 #include "GameObject.h"
+#include "Mario.h"
 
 #define BRICK_BBOX_WIDTH  32
 #define BRICK_BBOX_HEIGHT 32
 #define NEN_TYPE		3
 
-#define CANDLE_STATE_BIG 300
-#define CANDLE_STATE_SMALL 400
-#define CANDLE_STATE_DIE 500
-#define CANDLE_STATE_1	600
-#define CANDLE_STATE_2	700
-#define CANDLE_STATE_3	800
+#define CANDLE_STATE_BIG			300
+#define CANDLE_STATE_SMALL			400
+#define CANDLE_STATE_DIE			500
+#define CANDLE_STATE_ITEMS_WHIP1	600
+#define CANDLE_STATE_ITEMS_WHIP2	700
+#define CANDLE_STATE_ITEMS_WHIP3	800
+#define CANDLE_STATE_ITEMS_HEART	900
+#define CANDLE_STATE_BUMP			1000
+#define CANDLE_STATE_ITEMS_AXE		1100
+
 
 #define NEN_ANI 0
 #define NEN_ANI_ITEM_AXE 1
@@ -37,6 +42,7 @@ public:
 	bool isItems;
 	int typeItems;
 	int ani;
+	CMario* mario;
 	Nen();
 	virtual void Render();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);

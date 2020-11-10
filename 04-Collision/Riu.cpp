@@ -9,7 +9,7 @@ CRiu::CRiu() {
 	SetPosition(x_mario, y_mario);
 	if (mario->GetInstance()->nx > 0)
 	{
-		AddAnimation(4000);
+		AddAnimation(807);
 		vx = RIU_SPEED;
 		vy = -(RIU_SPEED + 0.2f);
 	}

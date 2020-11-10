@@ -70,7 +70,17 @@ public:
 	boolean burning = false;
 	boolean injured = false;
 	boolean allowCreateWhip = false;
-	int currentRoi;
+	boolean isBringItems = false;
+	boolean coRiu = false;
+	int whipType;	// type of whip 1,2,3 
+	int bullet;
+	int point;
+	int alpha, beta;		//for render
+	int health;
+	int life;
+	int bossHealth;
+	bool freeze;
+	int numWeapon;
 
 	float mario_x, mario_y;
 	CMario() : CGameObject()
@@ -78,7 +88,7 @@ public:
 		untouchable = 0;
 		mario_x = MARIO_X;
 		mario_y = MARIO_Y;
-		currentRoi = 0; 
+		whipType = 0;
 	}
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
@@ -89,5 +99,5 @@ public:
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	void vaChamTuong(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	bool CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem);
-	int GetCurrentWeapons() { return currentRoi; }
+	int GetCurrentWeapons() { return whipType; }
 };

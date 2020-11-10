@@ -57,15 +57,27 @@ void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 		case NEN_ANI_ITEM_WHIP:
 			ani = NEN_ANI_ITEM_WHIP;
+			if (mario->GetInstance()->GetCurrentWeapons() == 0) {
+				DebugOut(L"whip1");
+				state = CANDLE_STATE_ITEMS_WHIP2;
+			}
+			else if (mario->GetInstance()->GetCurrentWeapons() == 1) {
+				DebugOut(L"whip2");
+				state = CANDLE_STATE_ITEMS_WHIP3;
+			}
 			vy = 0.02;
-			state = CANDLE_STATE_2;
 			break;
-		case NEN_ANI_ITEM_AXE:
-			ani = NEN_ANI_ITEM_AXE;
+		case NEN_ANI_ITEM_BIG_HEART:
+			ani = NEN_ANI_ITEM_BIG_HEART;
+			state = CANDLE_STATE_ITEMS_HEART;
 			vy = 0.02;
-			state = CANDLE_STATE_3;
+			break;
+		case NEN_ANI_ITEM_AXE: 
+			ani = NEN_ANI_ITEM_AXE;
+			state = CANDLE_STATE_ITEMS_AXE;
+			vy = 0.02;
+			break;
 		}
-
 	}
 	else
 		ani = NEN_ANI;
@@ -115,16 +127,17 @@ void Nen::SetState(int state)
 
 	switch (state)
 	{
-	case CANDLE_STATE_1: // roi va cham nen -> candle state 1
+	case CANDLE_STATE_BUMP: // roi va cham nen -> candle sinh ra items
 		isDestroy = true;
 		break;
-	case CANDLE_STATE_2:
-
-
 	case CANDLE_STATE_DIE:
 		dead = true;
 		isDestroy = false;
 		break;
+	case CANDLE_STATE_ITEMS_WHIP2:
+	case CANDLE_STATE_ITEMS_WHIP3:
+	case CANDLE_STATE_ITEMS_HEART:
+	case CANDLE_STATE_ITEMS_AXE:
 	case CANDLE_STATE_BIG:
 	case CANDLE_STATE_SMALL:
 		break;

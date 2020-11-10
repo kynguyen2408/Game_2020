@@ -37,6 +37,8 @@
 #include "Map.h"
 #include "Nen.h"
 #include "Camera.h"
+#include "Aquaman.h"
+#include "Ball.h"
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
 #define MAIN_WINDOW_TITLE L"04 - Collision"
@@ -54,7 +56,8 @@
 #define ID_TEX_DAO 40
 #define ID_TEX_NEN 50
 #define ID_TEX_ITEMS 60
-
+#define ID_TEX_AQUAMAN 70
+#define ID_TEX_BALL 80
 
 CGame *game;
 
@@ -66,9 +69,13 @@ CRiu* riu;
 CFire* fire;
 Map* map;
 Nen* nen;
+CAquaman *aquaman;
+CBall *ball;
 CCamera* camera;
 vector<LPGAMEOBJECT> objects;
 CMario * CMario::__instance = NULL;
+CAquaman * CAquaman::__instance = NULL;
+
 class CSampleKeyHander: public CKeyEventHandler
 {
 	virtual void KeyState(BYTE *states);
@@ -102,12 +109,14 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 				mario->SetState(MARIO_STATE_HIT);
 		}
 		break;
-	case DIK_S:
+	case DIK_S: // riu
 		DebugOut(L"[INFO] S: %d\n", KeyCode);
-		if (mario->hitting == false)
-			mario->SetState(MARIO_STATE_THROW);
+		if (mario->GetInstance()->coRiu) {
+			if (mario->hitting == false)
+				mario->SetState(MARIO_STATE_THROW);
+		}
 		break;
-	case DIK_D:
+	case DIK_D: // lua
 		DebugOut(L"[INFO] D: %d\n", KeyCode);
 		if (mario->hitting == false)
 			mario->SetState(MARIO_STATE_BURN);
@@ -234,15 +243,29 @@ void LoadResources()
 	//}
 	//nen
 	Nen *nen = new Nen();
-	nen->setTypeItems(NEN_ANI_ITEM_WHIP);
-	nen->SetPosition(400 + 0 * 16.0f, 320);
+	nen->setTypeItems(NEN_ANI_ITEM_AXE);
+	nen->SetPosition(100 + 0 * 16.0f, 320);
 	objects.push_back(nen);
 
 	Nen *nen2 = new Nen();
-	nen2->setTypeItems(NEN_ANI_ITEM_AXE);
-	nen2->SetPosition(700 + 0 * 16.0f, 320);
+	nen2->setTypeItems(NEN_ANI_ITEM_BIG_HEART);
+	nen2->SetPosition(200 + 0 * 16.0f, 320);
 	objects.push_back(nen2);
 
+	Nen *nen3 = new Nen();
+	nen3->setTypeItems(NEN_ANI_ITEM_WHIP);
+	nen3->SetPosition(300 + 0 * 16.0f, 320);
+	objects.push_back(nen3);
+
+	Nen *nen4 = new Nen();
+	nen4->setTypeItems(NEN_ANI_ITEM_WHIP);
+	nen4->SetPosition(400 + 0 * 16.0f, 320);
+	objects.push_back(nen4);
+
+	aquaman = aquaman->GetInstance();
+	aquaman->SetPosition(aquaman->aquaman_x, aquaman->aquaman_y);
+	aquaman->SetState(AQUAMAN_WALK_LEFT);
+	objects.push_back(aquaman);
 	
 	//tao camera
 	camera = camera->GetInstance();
@@ -271,13 +294,13 @@ void Update(DWORD dt)
 		float x, y;
 
 		mario->GetPosition(x, y);
-		if (mario->launching == true)
+		if (mario->launching == true) // dao
 		{ 
 				dao = new CDao();
 				objects.push_back(dao);
 				mario->launching = false;
 		}
-		else if (mario->throwing == true)
+		else if (mario->throwing == true) // riu
 		{
 			riu = new CRiu();
 			objects.push_back(riu);
@@ -325,12 +348,21 @@ void Update(DWORD dt)
 		if (objects[i]->dead == true)
 			objects.erase(objects.begin() + i);
 	}
-	
-
+	float x, y;
+	aquaman->GetInstance()->GetPosition(x, y);
+	if (x == 400 || x == 100) {
+		ball = new CBall();
+		objects.push_back(ball);
+		aquaman->SetState(AQUAMAN_FIRE_LEFT);
+		aquaman->animations[0]->isLastFrame = false;
+	}
 	
 	mario->vaChamTuong(dt, &wallObjects);
+	aquaman->VaChamDat(dt, &wallObjects);
 	if(fire != NULL)
 		fire->VaChamDat(dt, &wallObjects);
+	
+
 
 
 

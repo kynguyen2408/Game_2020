@@ -119,7 +119,12 @@ CAnimations * CAnimations::GetInstance()
 
 void CAnimations::Add(int id, LPANIMATION ani)
 {
-	animations[id] = ani;
+	if (animations[id] != NULL)
+	{
+		push(id, ani);
+	}
+	else
+		animations[id] = ani;
 }
 
 LPANIMATION CAnimations::Get(int id)
@@ -158,4 +163,9 @@ void CAnimations::LoadResources()
 		}
 	}
 	File.close();
+}
+void CAnimations::push(int id, LPANIMATION ani)
+{
+	for (auto it = ani->frames.begin(); it != ani->frames.end(); ++it)
+		animations[id]->frames.push_back(*it);
 }
