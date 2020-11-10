@@ -115,7 +115,6 @@ void CRoi::Render()
 		dead = true;
 	}
 	animations[ani]->Render(x, y);
-	RenderBoundingBox();
 
 	
 

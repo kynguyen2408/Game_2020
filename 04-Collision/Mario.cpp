@@ -47,6 +47,8 @@ CMario::CMario() : CGameObject()
 	//mario->AddAnimation(599);		// die
 
 	untouchable = 0;
+	width = 40;
+
 	mario_x = MARIO_X;
 	mario_y = MARIO_Y;
 	whipType = 0;
@@ -57,6 +59,8 @@ CMario::CMario() : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	AddAnimation(400);		// idle right
+	AddAnimation(401);		// idle left
 
 	CGameObject::Update(dt);
 	vector<LPGAMEOBJECT> coEventsStatic;
@@ -115,6 +119,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				allowUpStairsRight = true;
 				allowDownStairsRight = false;
+				StairX = coEventsStatic.at(i)->x;
 				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
@@ -122,17 +127,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				allowDownStairsRight = true;
 				allowSit = false;
 				allowUpStairsRight = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
 			{
 				allowUpStairsLeft = true;
 				allowDownStairsLeft = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_DOWN)
 			{
 				allowDownStairsLeft = true;
 				allowSit = false;
 				allowUpStairsLeft = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			if (uppingRight)
 			{
@@ -680,6 +691,6 @@ bool CMario::chuyenCanhOne() {
 }
 void CMario::respawn()
 {
-	x = MARIO_X;
+	x = 1000;
 	y = MARIO_Y;
 }

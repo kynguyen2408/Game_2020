@@ -33,6 +33,8 @@
 #define NEN_ANI_ITEM_SMALL_HEART 12 
 #define NEN_ANI_ITEM_STOPWATCH 13
 #define NEN_ANI_ITEM_WHIP 14
+#define NEN_ANI_NEN_NHO 15
+
 
 
 class Nen : public CGameObject
@@ -40,6 +42,7 @@ class Nen : public CGameObject
 public:
 	bool isDestroy;
 	bool isItems;
+	bool candleBig;
 	int typeItems;
 	int ani;
 	CMario* mario;

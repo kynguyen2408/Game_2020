@@ -4,12 +4,13 @@
 
 Nen::Nen()
 {
+	candleBig = true;
 	type = NEN_TYPE;
 	dead = false;
 	isDestroy = false;
 	isItems = false;
 	vy = 0;
-	AddAnimation(301); // nen dung yen
+	AddAnimation(301); // nen to dung yen
 	AddAnimation(806); // axe
 	AddAnimation(802); // big heart
 	AddAnimation(815); // double shot
@@ -24,6 +25,7 @@ Nen::Nen()
 	AddAnimation(805); // small heart
 	AddAnimation(816); // stop watch
 	AddAnimation(801); // whip
+	AddAnimation(302); // nen nho
 
 }
 
@@ -38,13 +40,13 @@ void Nen::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
 	top = y;
-	right = x;
+	right = x + width;
 	if (isDestroy) {
-		bottom = y + BRICK_BBOX_HEIGHT;
+		bottom = y + width;
 	}
 
 	else
-		bottom = y + BRICK_BBOX_HEIGHT;
+		bottom = y + height;
 }
 
 void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -75,6 +77,12 @@ void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			vy = 0.02;
 			break;
 		}
+	}
+	else if (candleBig == true) {
+		ani = NEN_ANI;
+	}
+	else if (candleBig == false) {
+		ani = NEN_ANI_NEN_NHO;
 	}
 	else
 		ani = NEN_ANI;
@@ -136,7 +144,11 @@ void Nen::SetState(int state)
 	case CANDLE_STATE_ITEMS_HEART:
 	case CANDLE_STATE_ITEMS_AXE:
 	case CANDLE_STATE_BIG:
+		candleBig = true; 
+		break;
 	case CANDLE_STATE_SMALL:
+		candleBig = false;
+		break;
 		break;
 	default:
 		break;

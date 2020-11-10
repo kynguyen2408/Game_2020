@@ -1,5 +1,6 @@
 #include "Aquaman.h"
 #include "Brick.h"
+#include "Ball.h"
 CAquaman::CAquaman()
 {
 	type = AQUAMAN_TYPE;
@@ -11,9 +12,11 @@ CAquaman::CAquaman()
 	AddAnimation(915); //AQUAMAN_FIRE_LEFT);
 	AddAnimation(916); //AQUAMAN_FIRE_RIGHT);
 	startCounting = 0;
-	aquaman_x = AQUAMAN_X;
-	aquaman_y = AQUAMAN_Y;
+	vy = -0.5f;
 	onYard = false;
+	isFire = false;
+	isSitting = false;
+
 	
 }
 
@@ -31,17 +34,38 @@ void CAquaman::GetBoundingBox(float &left, float &top, float &right, float &bott
 
 void CAquaman::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
+
 	CGameObject::Update(dt, coObjects);
 
+	x += dx;
+	y += dy;
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
-	if (vx < 0 && x < 100) {
-		x = 100; vx = -vx;
+	if (vx < 0 && x < aquaman_move_left) {
+		vx = -vx;
+		SetState(AQUAMAN_STATE_SIT_RIGHT);
+		StartCounting();
 	}
 
-	if (vx > 0 && x > 400) {
-		x = 400; vx = -vx;
+	if (vx > 0 && x > aquaman_move_right) {
+		 vx = -vx;
+		SetState(AQUAMAN_STATE_SIT_LEFT);
+		StartCounting();
+	}
+	if (state == AQUAMAN_STATE_SIT_RIGHT) {
+		if (GetTickCount() - startCounting > 1000) {
+			startCounting = 0;
+			SetState(AQUAMAN_STATE_FIRE_RIGHT);
+		}
+
+	}
+	else if (state == AQUAMAN_STATE_SIT_LEFT) {
+		if (GetTickCount() - startCounting > 1000) {
+			startCounting = 0;
+			SetState(AQUAMAN_STATE_FIRE_LEFT);
+		}
+
 	}
 }
 
@@ -49,12 +73,14 @@ void CAquaman::Render()
 {
 	int ani;
 	if (vx > 0) ani = AQUAMAN_WALK_RIGHT;
-	else ani = AQUAMAN_WALK_LEFT;
-	if (state == AQUAMAN_FIRE_LEFT) {
-
-		ani = AQUAMAN_FIRE_RIGHT;
-		vx = 0;
+	else if (vx < 0) ani = AQUAMAN_WALK_LEFT;
+	else {
+		if (nx == 1) {
+			ani = AQUAMAN_FIRE_LEFT;
+		}
+		else if (nx == -1) ani = AQUAMAN_FIRE_RIGHT;
 	}
+	
 
 	animations[ani]->Render(x, y);
 	RenderBoundingBox();
@@ -70,14 +96,29 @@ void CAquaman::SetState(int state)
 			vx = 0;
 			vy = 0;
 			break;
+		case AQUAMAN_STATE_SIT_RIGHT:
+			vx = 0;
+			nx = 1;
+			isSitting = true;
+			break;
+		case AQUAMAN_STATE_SIT_LEFT:
+			vx = 0;
+			nx = -1;
+			isSitting = true;
+			break;
+		case AQUAMAN_STATE_FIRE_RIGHT:
+			isFire = true;
+			break;
 		case AQUAMAN_WALK_RIGHT:
 			vx = AQUAMAN_WALKING_SPEED;
+			nx = 1;
+			break;
 		case AQUAMAN_WALK_LEFT:
 			vx = -AQUAMAN_WALKING_SPEED;
-		case AQUAMAN_FIRE_LEFT:
+			nx = -1;
 			break;
-		case AQUAMAN_FIRE_RIGHT:
-			break;
+
+
 
 	}
 }
@@ -88,14 +129,9 @@ void CAquaman::VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CGameObject::Update(dt);
 	coEvents.clear();
-	if (onYard && GetTickCount() - startCounting > 100) {
-		vy += AQUAMAN_GRAVITY * dt;
-		startCounting = 0;
-	}
-	else
-	{
-		vy += -AQUAMAN_GRAVITY * dt;
-	}
+	
+	vy += AQUAMAN_GRAVITY * dt;
+	
 	// turn off collision when die 
 	CalcPotentialCollisions(coObjects, coEvents);
 
@@ -119,14 +155,14 @@ void CAquaman::VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
 
-			if (dynamic_cast<CBrick *>(e->obj)) 
+			if (e->obj->type == BRICK_TYPE)
 			{
 				CBrick *brick = dynamic_cast<CBrick *>(e->obj);
 
-				if (e->ny == 1)
+				if (e->ny == -1)
 				{
-					y += dy;
-					StartCounting();
+					vy = 0;
+					
 				}
 
 			}
@@ -137,8 +173,3 @@ void CAquaman::VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 
 
-CAquaman * CAquaman::GetInstance()
-{
-	if (__instance == NULL) __instance = new CAquaman();
-	return __instance;
-}

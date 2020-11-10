@@ -4,8 +4,8 @@ void CStairs::GetBoundingBox(float& left, float& top, float& right, float& botto
 {
 	left = x;
 	top = y;
-	right = x + STAIRS_BBOX_WIDTH;
-	bottom = y + STAIRS_BBOX_HEIGHT;
+	right = x + width;
+	bottom = y + height;
 }
 CStairs::CStairs()
 {

@@ -4,18 +4,8 @@ CBall::CBall() {
 
 	type = BALL_TYPE;
 	float x_aquaman, y_aquaman;
-	aquaman->GetInstance()->GetPosition(x_aquaman, y_aquaman);
-	SetPosition(x_aquaman, y_aquaman);
-	if (aquaman->GetInstance()->vx > 0)
-	{
-		AddAnimation(918); // dao phai
-		vx = BALL_SPEED;
-	}
-	else
-	{
-		AddAnimation(917); // dao trai
-		vx = -BALL_SPEED;
-	}
+	AddAnimation(918); // dao phai
+	AddAnimation(917); // dao trai
 
 	dead = false;
 
@@ -72,7 +62,25 @@ void CBall::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CBall::Render()
 {
 	int ani;
-	ani = BALL_ANI;
+	if (vx > 0) {
+		ani = BALL_ANI_RIGHT;
+	}
+	else ani = BALL_ANI_LEFT;
 	animations[ani]->Render(x,y);
 	RenderBoundingBox();
+}
+
+void CBall::SetState(int state)
+{
+	CGameObject::SetState(state);
+	switch (state) {
+	case BALL_STATE_DIE:
+		break;
+	case BALL_STATE_LEFT:
+		vx = -BALL_SPEED;
+		break;
+	case BALL_STATE_RIGHT:
+		vx = BALL_SPEED;
+		break;
+	}
 }
