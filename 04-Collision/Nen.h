@@ -10,10 +10,9 @@
 #define CANDLE_STATE_BIG			300
 #define CANDLE_STATE_SMALL			400
 #define CANDLE_STATE_DIE			500
-#define CANDLE_STATE_ITEMS_WHIP1	600
-#define CANDLE_STATE_ITEMS_WHIP2	700
-#define CANDLE_STATE_ITEMS_WHIP3	800
+#define CANDLE_STATE_ITEMS_WHIP		600
 #define CANDLE_STATE_ITEMS_HEART	900
+#define CANDLE_STATE_ITEMS_HEART_MALL 800
 #define CANDLE_STATE_BUMP			1000
 #define CANDLE_STATE_ITEMS_AXE		1100
 
@@ -33,6 +32,8 @@
 #define NEN_ANI_ITEM_SMALL_HEART 12 
 #define NEN_ANI_ITEM_STOPWATCH 13
 #define NEN_ANI_ITEM_WHIP 14
+#define NEN_ANI_NEN_NHO 15
+
 
 
 class Nen : public CGameObject
@@ -40,6 +41,7 @@ class Nen : public CGameObject
 public:
 	bool isDestroy;
 	bool isItems;
+	bool candleBig;
 	int typeItems;
 	int ani;
 	CMario* mario;

@@ -24,11 +24,12 @@ class CPanther : public CGameObject
 {
 	boolean jumping = false;
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
-	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
+	
 	void Render();
 public:
 	CMario* mario;
 	CPanther();
+	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void SetState(int state);
 	void VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 };

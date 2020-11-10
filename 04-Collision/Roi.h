@@ -7,9 +7,11 @@
 #define ROI_BBOX_WIDTH 60
 #define ROI_BBOX_HEIGHT 20
 #define ROI_BBOX_HEIGHT_DIE 9
-#define ROI_STATE_DIE	0
+#define ROI_STATE_DIE	10000
 #define ROI_ANI 0
-#define ROI_ANI 1
+#define ROI_ANI1 1
+#define ROI_ANI2 2
+
 
 
 #define ROI_TYPE		111

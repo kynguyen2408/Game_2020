@@ -47,6 +47,8 @@ CMario::CMario() : CGameObject()
 	//mario->AddAnimation(599);		// die
 
 	untouchable = 0;
+	width = 40;
+
 	mario_x = MARIO_X;
 	mario_y = MARIO_Y;
 	whipType = 0;
@@ -57,6 +59,8 @@ CMario::CMario() : CGameObject()
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	AddAnimation(400);		// idle right
+	AddAnimation(401);		// idle left
 
 	CGameObject::Update(dt);
 	vector<LPGAMEOBJECT> coEventsStatic;
@@ -94,27 +98,29 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				switch (coEventsStatic.at(i)->state)
 				{
-				case CANDLE_STATE_ITEMS_WHIP2:
-					whipType = 1;
-					break;
-				case CANDLE_STATE_ITEMS_WHIP3:
-					whipType = 1;
+				case CANDLE_STATE_ITEMS_WHIP:
+					DebugOut(L"update roi");
+					whipType +=1;
+					coEventsStatic.at(i)->dead = true;
 					break;
 				case CANDLE_STATE_ITEMS_HEART:
-					whipType = 1;
+					DebugOut(L"lum tim");
+					coEventsStatic.at(i)->dead = true;
+					//whipType = 1;
 					break;
-				case CANDLE_STATE_ITEMS_AXE:
-					coRiu = true;
+				case CANDLE_STATE_ITEMS_HEART_MALL:
+					coEventsStatic.at(i)->dead = true;
 					break;
 				default:
 					break;
-				coEventsStatic.at(i)->dead = true;
 				}
+				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_UP)
 			{
 				allowUpStairsRight = true;
 				allowDownStairsRight = false;
+				StairX = coEventsStatic.at(i)->x;
 				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
@@ -122,17 +128,23 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				allowDownStairsRight = true;
 				allowSit = false;
 				allowUpStairsRight = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
 			{
 				allowUpStairsLeft = true;
 				allowDownStairsLeft = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_DOWN)
 			{
 				allowDownStairsLeft = true;
 				allowSit = false;
 				allowUpStairsLeft = false;
+				StairX = coEventsStatic.at(i)->x;
+
 			}
 			if (uppingRight)
 			{
@@ -150,78 +162,79 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 
-		//xet vat di chuyen 
-		vector<LPCOLLISIONEVENT> coEventMoving;
-		vector<LPCOLLISIONEVENT> coEventsResultMoving;
+		
+	}
+	//xet vat di chuyen 
+	vector<LPCOLLISIONEVENT> coEventMoving;
+	vector<LPCOLLISIONEVENT> coEventsResultMoving;
 
-		coEventMoving.clear();
-		CalcPotentialCollisions(coObjects, coEventMoving);
+	coEventMoving.clear();
+	CalcPotentialCollisions(coObjects, coEventMoving);
 
 
-		if (coEventMoving.size() == 0)
-		{
-
-		}
-		else
-		{
-
-			float min_tx, min_ty, nx = 0, ny;
-
-			FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
-			for (UINT i = 0; i < coEventsResultMoving.size(); i++)
-			{
-				LPCOLLISIONEVENT e = coEventsResultMoving[i];
-				if (e->obj->catalog == CATALOG_ENEMY)
-				{
-
-					if (e->ny != 0) //va tram ben tren ben trai
-					{
-						if (CGameObject::GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = -CGameObject::nx;
-							if (vx <= 0)
-								vx = -0.1;
-							else
-								vx = 0.1;
-							SetState(MARIO_STATE_INJURED);
-						}
-					}
-					else if (e->nx < 0) //va tram vang ben trai
-					{
-						if (CGameObject::GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = 1;
-							vx = -0.1;
-							SetState(MARIO_STATE_INJURED);
-
-						}
-					}
-					else if (e->nx > 0) //va tram vang ben phai
-					{
-						if (e->obj->GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = -1;
-							vx = 0.1;
-							SetState(MARIO_STATE_INJURED);
-
-						}
-					}
-					/*else if (e->nx != 0)
-					{
-						if (untouchable==0)
-						{
-							if (goomba->GetState()!=GOOMBA_STATE_DIE)
-							{
-									SetState(MARIO_STATE_DIE);
-							}
-						}
-					}*/
-				}
-			}
-		}
-		for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
+	if (coEventMoving.size() == 0)
+	{
 
 	}
+	else
+	{
+
+		float min_tx, min_ty, nx = 0, ny;
+
+		FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
+		for (UINT i = 0; i < coEventsResultMoving.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResultMoving[i];
+			if (e->obj->catalog == CATALOG_ENEMY)
+			{
+
+				if (e->ny != 0) //va tram ben tren ben trai
+				{
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = -CGameObject::nx;
+						if (vx <= 0)
+							vx = -0.1;
+						else
+							vx = 0.1;
+						SetState(MARIO_STATE_INJURED);
+					}
+				}
+				else if (e->nx < 0) //va tram vang ben trai
+				{
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = 1;
+						vx = -0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				else if (e->nx > 0) //va tram vang ben phai
+				{
+					if (e->obj->GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = -1;
+						vx = 0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				/*else if (e->nx != 0)
+				{
+					if (untouchable==0)
+					{
+						if (goomba->GetState()!=GOOMBA_STATE_DIE)
+						{
+								SetState(MARIO_STATE_DIE);
+						}
+					}
+				}*/
+			}
+		}
+	}
+	for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
+
 }
 
 	
@@ -648,24 +661,24 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
 
-bool CMario::CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem)
-{
-
-	for (UINT i = 0; i < listItem->size(); i++)
-	{
-		if (IsCollisionAABB(GetRect(), listItem->at(i)->GetRect()))
-		{
-			int idItem = listItem->at(i)->GetState(); // kiem tra xem tai day item do co id la gi ? 
-
-			switch (idItem)
-			{
-			/*case HOLY_WATER:
-				SetCurrentWeapons(idItem);*/
-			}
-			return true;
-		}
-	}
-}
+//bool CMario::CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem)
+//{
+//
+//	for (UINT i = 0; i < listItem->size(); i++)
+//	{
+//		if (IsCollisionAABB(GetRect(), listItem->at(i)->GetRect()))
+//		{
+//			int idItem = listItem->at(i)->GetState(); // kiem tra xem tai day item do co id la gi ? 
+//
+//			switch (idItem)
+//			{
+//			/*case HOLY_WATER:
+//				SetCurrentWeapons(idItem);*/
+//			}
+//			return true;
+//		}
+//	}
+//}
 
 CMario * CMario::GetInstance()
 {
@@ -680,6 +693,6 @@ bool CMario::chuyenCanhOne() {
 }
 void CMario::respawn()
 {
-	x = MARIO_X;
+	x = 1000;
 	y = MARIO_Y;
 }

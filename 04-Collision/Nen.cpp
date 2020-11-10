@@ -4,12 +4,13 @@
 
 Nen::Nen()
 {
+	candleBig = true;
 	type = NEN_TYPE;
 	dead = false;
 	isDestroy = false;
 	isItems = false;
 	vy = 0;
-	AddAnimation(301); // nen dung yen
+	AddAnimation(301); // nen to dung yen
 	AddAnimation(806); // axe
 	AddAnimation(802); // big heart
 	AddAnimation(815); // double shot
@@ -24,6 +25,7 @@ Nen::Nen()
 	AddAnimation(805); // small heart
 	AddAnimation(816); // stop watch
 	AddAnimation(801); // whip
+	AddAnimation(302); // nen nho
 
 }
 
@@ -38,13 +40,13 @@ void Nen::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
 	left = x;
 	top = y;
-	right = x;
+	right = x + width;
 	if (isDestroy) {
-		bottom = y + BRICK_BBOX_HEIGHT;
+		bottom = y + width;
 	}
 
 	else
-		bottom = y + BRICK_BBOX_HEIGHT;
+		bottom = y + height;
 }
 
 void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -54,13 +56,9 @@ void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 		case NEN_ANI_ITEM_WHIP:
 			ani = NEN_ANI_ITEM_WHIP;
-			if (mario->GetInstance()->GetCurrentWeapons() == 0) {
+			if (mario->GetInstance()->GetCurrentWeapons() >= 0) {
 				DebugOut(L"whip1");
-				state = CANDLE_STATE_ITEMS_WHIP2;
-			}
-			else if (mario->GetInstance()->GetCurrentWeapons() == 1) {
-				DebugOut(L"whip2");
-				state = CANDLE_STATE_ITEMS_WHIP3;
+				state = CANDLE_STATE_ITEMS_WHIP;
 			}
 			vy = 0.02;
 			break;
@@ -74,10 +72,26 @@ void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			state = CANDLE_STATE_ITEMS_AXE;
 			vy = 0.02;
 			break;
+		case NEN_ANI_ITEM_KNIFE: 
+			ani = NEN_ANI_ITEM_KNIFE; 
+			vy = 0.02; 
+			break;
+		case NEN_ANI_ITEM_DOUBLESHOT: 
+			ani = NEN_ANI_ITEM_DOUBLESHOT; 
+			vy = 0.02;
+			break;
+		case NEN_ANI_ITEM_SMALL_HEART:
+			ani = NEN_ANI_ITEM_SMALL_HEART;
+			state = CANDLE_STATE_ITEMS_HEART_MALL;
+			vy = 0.02;
 		}
 	}
-	else
+	else if (candleBig == true) {
 		ani = NEN_ANI;
+	}
+	else if (candleBig == false) {
+		ani = NEN_ANI_NEN_NHO;
+	}
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -128,15 +142,19 @@ void Nen::SetState(int state)
 		isDestroy = true;
 		break;
 	case CANDLE_STATE_DIE:
-		dead = true;
 		isDestroy = false;
+		dead = true;
 		break;
-	case CANDLE_STATE_ITEMS_WHIP2:
-	case CANDLE_STATE_ITEMS_WHIP3:
+	case CANDLE_STATE_ITEMS_WHIP:
 	case CANDLE_STATE_ITEMS_HEART:
+	case CANDLE_STATE_ITEMS_HEART_MALL:
 	case CANDLE_STATE_ITEMS_AXE:
 	case CANDLE_STATE_BIG:
+		candleBig = true; 
+		break;
 	case CANDLE_STATE_SMALL:
+		candleBig = false;
+		break;
 		break;
 	default:
 		break;

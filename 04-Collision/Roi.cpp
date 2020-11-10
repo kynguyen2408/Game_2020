@@ -10,19 +10,18 @@ CRoi::CRoi() {
 	ishitting = false;
 	//IsThrowing = false;
 	dead = false;
-
-	if (mario->GetInstance()->nx > 0)
-	{
-		AddAnimation(603); // roi phai
-		AddAnimation(604); // roi phai 2
-		AddAnimation(605); // roi phai 3
-	}
-	else
-	{
-		AddAnimation(600); // roi trai
-		AddAnimation(601); // roi trai 2
-		AddAnimation(602); // roi trai 3
-	}
+		if (mario->GetInstance()->nx > 0)
+		{
+			AddAnimation(603); // roi phai
+			AddAnimation(604); // roi phai 2
+			AddAnimation(605); // roi phai 3
+		}
+		else
+		{
+			AddAnimation(600); // roi trai
+			AddAnimation(601); // roi trai 2
+			AddAnimation(602); // roi trai 3
+		}
 	animations[mario->GetInstance()->whipType]->isLastFrame = false;
 	animations[mario->GetInstance()->whipType]->currentFrame = -1;
 
@@ -30,7 +29,7 @@ CRoi::CRoi() {
 void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 	int ani;
-	ani = mario->GetInstance()->currentRoi;
+	ani = mario->GetInstance()->whipType;
 	if (animations[ani]->currentFrame == 3)
 	{
 		if (mario->GetInstance()->whipType == 0) {
@@ -106,16 +105,11 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 void CRoi::Render()
 {
 	int ani;
-
-	if (nx == 1) {
-		ani = ROI_ANI;
-	}
 	ani = mario->GetInstance()->whipType;
 	if (animations[ani]->currentFrame == 3) {
 		dead = true;
 	}
 	animations[ani]->Render(x, y);
-	RenderBoundingBox();
 
 	
 
