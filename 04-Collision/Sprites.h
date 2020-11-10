@@ -2,7 +2,6 @@
 #include <Windows.h>
 #include <d3dx9.h>
 #include <unordered_map>
-
 using namespace std;
 
 class CSprite
@@ -17,9 +16,9 @@ class CSprite
 	LPDIRECT3DTEXTURE9 texture;
 public: 
 	CSprite(int id, int left, int top, int right, int bottom, LPDIRECT3DTEXTURE9 tex);
-
 	void Draw(float x, float y, int alpha = 255);
 	void Draw(float x, float y, float left, float top, float right, float bottom);
+
 
 };
 
@@ -38,6 +37,7 @@ public:
 	void Add(int id, int left, int top, int right, int bottom, LPDIRECT3DTEXTURE9 tex);
 	LPSPRITE Get(int id);
 	LPSPRITE &operator[](int id) {return sprites[id];}
+	void LoadResources();
 
 	static CSprites * GetInstance();
 };
@@ -64,8 +64,9 @@ class CAnimation
 	
 	int defaultTime;
 	
-	vector<LPANIMATION_FRAME> frames;
+	
 public:
+	vector<LPANIMATION_FRAME> frames;
 	bool isLastFrame;
 	int currentFrame;
 	CAnimation(int defaultTime) { this->defaultTime = defaultTime; lastFrameTime = -1; currentFrame = -1; isLastFrame = false; }
@@ -84,7 +85,8 @@ class CAnimations
 public:
 	void Add(int id, LPANIMATION ani);
 	LPANIMATION Get(int id);
-
+	void LoadResources();
+	void push(int id, LPANIMATION ani);
 	static CAnimations * GetInstance();
 };
 

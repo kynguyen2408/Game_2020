@@ -60,6 +60,12 @@
     <ClInclude Include="Fire.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Aquaman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Ball.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Panther.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Stairs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Aquaman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Ball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

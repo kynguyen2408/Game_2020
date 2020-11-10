@@ -26,7 +26,7 @@ void Map::Render()
 {
 	CTextures* textures = CTextures::GetInstance();
 	LPDIRECT3DTEXTURE9 texMap;
-	texMap = textures->Get(99);
+	texMap = textures->Get(40);
 	CSprites* sprites = CSprites::GetInstance();
 	sprites->Add(1111, 0, 0, 32, 1568, texMap);
 

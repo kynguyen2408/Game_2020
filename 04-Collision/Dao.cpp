@@ -9,12 +9,12 @@ CDao::CDao() {
 	SetPosition(x_mario, y_mario);
 	if (mario->GetInstance()->nx > 0)
 	{
-		AddAnimation(3000);
+		AddAnimation(803); // dao phai
 		vx = DAO_SPEED;
 	}
 	else 
 	{
-		AddAnimation(3001);
+		AddAnimation(804); // dao trai
 		vx = -DAO_SPEED;
 	}
 	//IsThrowing = false;

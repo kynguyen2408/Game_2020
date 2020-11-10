@@ -6,7 +6,8 @@
 #include "debug.h"
 #include "Game.h"
 #include "textures.h"
-
+#include <fstream>
+#include <string>
 CTextures * CTextures::__instance = NULL;
 
 CTextures::CTextures()
@@ -67,3 +68,20 @@ LPDIRECT3DTEXTURE9 CTextures::Get(unsigned int i)
 
 
 
+void CTextures::LoadResources()
+{
+	ifstream File;
+	File.open(L"text\\texture.txt");
+	int rgb1, rgb2, rgb3, id;
+	string path;
+	while (!File.eof())
+	{
+		File >> id >> path >> rgb1 >> rgb2 >> rgb3;
+		std::wstring stemp = std::wstring(path.begin(), path.end());		//change string to LPSWSTR
+		LPCWSTR sw = stemp.c_str();
+		Add(id, sw, D3DCOLOR_XRGB(rgb1, rgb2, rgb3));
+	}
+	File.close();
+
+
+}

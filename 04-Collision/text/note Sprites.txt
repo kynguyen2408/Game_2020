@@ -1,0 +1,80 @@
+20000 WHIP
+10000 SIMON
+
+10029->10032 Right - flash simon 
+10032->10036 Left - flash simon
+10037: stand stair up right
+10038: stand stair up left
+10039: stand stair down right
+10040: stand stair down left
+10037 -10004 walk stair up right 520
+10038 -10014 walk stair up left	 521
+
+10039 -10004 walk stair down right 524
+10040 -10014 walk stair down left 525
+
+10041-10043 hit stair up right 526
+10044-10046 hit stair up left 527
+10047-10049 hit stair down right 528
+10050-10052 hit stair down left 529
+
+10053 hurt right 530
+10054 hurt left  531
+10055 dead	 532
+
+30000 OJ - 
+ + 30001,2 : fire_pillar 
+ + 30005,5 : door 303 304
+ + 30007 : conner wall map 1 306
+ + 30008 : brick 307
+ + 30009 : small brick 308
+40000 Item 
+ + 40006 : AXE Item 806
+ + 40007-40010 : axe move 807
+ + 40011 : fire bottle item 808
+ + 40012 : bottle throw 809 
+ + 40013 -40014 : fire 810
+ + 40015 : money blue 811
+ + 40016 : money red 812
+ + 40017 : money white 813 
+ + 40018 : invisible 814
+ + 40019 : double buff 815
+ + 40020 : clock 816
+ + 40021 : cross 817
+ + 40022 : roast 818
+50000 effects
++ 50001-> 50003 : dead effect
++ 50004 : water effect
++ 50005 : brick effect
+
+
+60000 enemy
++60000 ghost
++60004 panther
+ - 60004 - sit left 903 
+ - 60008 - sit right 904 
+ - 60005 -> 60007 run left 905 
+ - 60009 -> 60011 run right 906
+ - 60007 jump left 907
+ - 60011 jump right 908
++ 60012 BAT
+ - 60012->60014 bat left 909
+ - 60014->60017 bat right 910 
++ 60018 MERMAN
+ - 60018 stand left 911
+ - 60018 60019 walk left 913
+ - 60020 fire left 915
++ 60021 stand right 912
+ - 60021 60022 walk right 914
+ - 60023 fire right 916
+ - 60024 fireball left 917 
+ - 60025 fireball right 918
++ 60026 BOSS_stand  919
++ 60027- 60028 920
+90000 - scoreboard 
+90004 title screen 1000
+90005 - 90016 BATFLY 1001
+90017 - 90019 BATFLY_NOT_MOVE 1002
+90020 CASTLE 1003
+90021 helicopter 1004 
+90022 90023 bat 1005

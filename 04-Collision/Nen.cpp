@@ -8,16 +8,30 @@ Nen::Nen()
 	dead = false;
 	isDestroy = false;
 	isItems = false;
+	vy = 0;
+	AddAnimation(301); // nen dung yen
+	AddAnimation(806); // axe
+	AddAnimation(802); // big heart
+	AddAnimation(815); // double shot
+	AddAnimation(808); // holly water
+	AddAnimation(814); // invincibility
+	AddAnimation(803); // knife
+	AddAnimation(811); // money blue
+	AddAnimation(812); // money red
+	AddAnimation(813); // money white
+	AddAnimation(818); // roast
+	AddAnimation(817); // rosary
+	AddAnimation(805); // small heart
+	AddAnimation(816); // stop watch
+	AddAnimation(801); // whip
+
 }
 
 void Nen::Render()
 {
-	int ani;
-	if (isDestroy) {
-		ani = NEN_ANI_ITEM;
-		state = CANDLE_STATE_2;
-	}
-	else ani = NEN_ANI_BIG;
+
+	
+	
 	animations[ani]->Render(x, y);
 	RenderBoundingBox();
 }
@@ -38,54 +52,73 @@ void Nen::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 
 void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	//vector<LPCOLLISIONEVENT> coEvents;
-	//vector<LPCOLLISIONEVENT> coEventsResult;
+	if (isDestroy) {
+		switch (typeItems)
+		{
+		case NEN_ANI_ITEM_WHIP:
+			ani = NEN_ANI_ITEM_WHIP;
+			if (mario->GetInstance()->GetCurrentWeapons() == 0) {
+				DebugOut(L"whip1");
+				state = CANDLE_STATE_ITEMS_WHIP2;
+			}
+			else if (mario->GetInstance()->GetCurrentWeapons() == 1) {
+				DebugOut(L"whip2");
+				state = CANDLE_STATE_ITEMS_WHIP3;
+			}
+			vy = 0.02;
+			break;
+		case NEN_ANI_ITEM_BIG_HEART:
+			ani = NEN_ANI_ITEM_BIG_HEART;
+			state = CANDLE_STATE_ITEMS_HEART;
+			vy = 0.02;
+			break;
+		case NEN_ANI_ITEM_AXE: 
+			ani = NEN_ANI_ITEM_AXE;
+			state = CANDLE_STATE_ITEMS_AXE;
+			vy = 0.02;
+			break;
+		}
+	}
+	else
+		ani = NEN_ANI;
 
-	//coEvents.clear();
-	//CalcPotentialCollisions(coObjects, coEvents);
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
 
-	////
-	//// TO-DO: make sure Goomba can interact with the world and to each of them too!
-	//// 
+	CGameObject::Update(dt);
+	coEvents.clear();
 
-	//x += dx;
-	//y += dy;
+	// turn off collision when die 
+	CalcPotentialCollisions(coObjects, coEvents);
 
-	//if (vx < 0 && x < 0) {
-	//	x = 0; vx = -vx;
-	//}
+	// reset untouchable timer if untouchable time has passed
+	// No collision occured, proceed normally
 
-	//if (vx > 0 && x > 290) {
-	//	x = 290; vx = -vx;
-	//}
-	//if (coEvents.size() == 0)
-	//{
-	//	for (UINT i = 0; i < coObjects->size(); i++) {
-	//		if (IsCollision(GetRect(), coObjects->at(i)->GetRect())) {
-	//			if (coObjects->at(i)->type == ROI_TYPE)
-	//				dead = true;
-	//		}
-	//	}
-	//	x += dx;
-	//	y += dy;
-	//}
-	//else
-	//{
-	//	float min_tx, min_ty, nx = 0, ny;
-	//	FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-	//	for (UINT i = 0; i < coEventsResult.size(); i++)
-	//	{
-	//		LPCOLLISIONEVENT e = coEventsResult[i];
+	if (coEvents.size() == 0)
+	{
+		x += dx;
+		y += dy;
+	}
+	else
+	{
+		// block 
+		
+		float min_tx, min_ty, nx = 0, ny;
 
-	//		if (dynamic_cast<CRoi *>(e->obj))  
-	//		{
-	//			SetState(NEN_STATE_DIE);
-	//			DebugOut(L"chet");
-	//		}
-	//	}
+		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
+		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
+		y += min_ty * dy + ny * 0.4f;
 
-	//}
-	//for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+		//jumping = false;
+
+		if (nx != 0) vx = 0;
+		if (ny != 0) vy = 0;
+
+	}
+	// clean up collision events
+	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+
+	
 }
 
 void Nen::SetState(int state)
@@ -94,21 +127,33 @@ void Nen::SetState(int state)
 
 	switch (state)
 	{
-	case CANDLE_STATE_1: 
+	case CANDLE_STATE_BUMP: // roi va cham nen -> candle sinh ra items
 		isDestroy = true;
 		break;
-	case CANDLE_STATE_2:
-
 	case CANDLE_STATE_DIE:
 		dead = true;
 		isDestroy = false;
 		break;
+	case CANDLE_STATE_ITEMS_WHIP2:
+	case CANDLE_STATE_ITEMS_WHIP3:
+	case CANDLE_STATE_ITEMS_HEART:
+	case CANDLE_STATE_ITEMS_AXE:
 	case CANDLE_STATE_BIG:
 	case CANDLE_STATE_SMALL:
 		break;
 	default:
 		break;
 	}
+}
+
+void Nen::setTypeItems(int typeItems)
+{
+	this->typeItems = typeItems;
+}
+
+int Nen::getTypeItems()
+{
+	return this->typeItems;
 }
 
 
