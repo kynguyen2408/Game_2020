@@ -8,10 +8,10 @@ CPanther::CPanther()
 	catalog = CATALOG_ENEMY;
 
 	
-	AddAnimation(910); //right
-	AddAnimation(911); //left
-	AddAnimation(900); //run right
-	AddAnimation(901); //run left
+	AddAnimation(904); //right
+	AddAnimation(903); //left
+	AddAnimation(906); //run right
+	AddAnimation(905); //run left
 
 
 

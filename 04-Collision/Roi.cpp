@@ -11,9 +11,25 @@ CRoi::CRoi() {
 	//IsThrowing = false;
 	dead = false;
 
+	if (mario->GetInstance()->nx > 0)
+	{
+		AddAnimation(603); // roi phai
+		AddAnimation(604); // roi phai 2
+		AddAnimation(605); // roi phai 3
+	}
+	else
+	{
+		AddAnimation(600); // roi trai
+		AddAnimation(601); // roi trai 2
+		AddAnimation(602); // roi trai 3
+	}
+	animations[mario->GetInstance()->whipType]->isLastFrame = false;
+	animations[mario->GetInstance()->whipType]->currentFrame = -1;
+
 }
 void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
+	
 	if (mario->GetInstance()->whipType == 0) {
 		left = x + 30;
 		top = y + 20;
@@ -48,11 +64,11 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		SetPosition(x_mario - 30, y_mario - 4 + y_roi);
 	else SetPosition(x_mario - 90, y_mario - 4 + y_roi);
 	// Calculate dx, dy 
-	
+
 	vector<LPGAMEOBJECT> coEvents;
 
 	coEvents.clear();
-	
+
 	for (UINT i = 0; i < coObjects->size(); i++)
 	{
 		LPGAMEOBJECT obj = coObjects->at(i);
@@ -62,7 +78,7 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			coEvents.push_back(coObjects->at(i));
 		}
 	}
-	if (coEvents.size() == 0){}
+	if (coEvents.size() == 0) {}
 	else
 	{
 		for (UINT i = 0; i < coEvents.size(); i++)
@@ -72,6 +88,7 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else if (coEvents.at(i)->type == NEN_TYPE) {
 				coEvents.at(i)->SetState(CANDLE_STATE_BUMP);
 			}
+		}
 	}
 }
 
@@ -90,7 +107,12 @@ void CRoi::Render()
 
 
 	animations[ani]->Render(x, y);
-	RenderBoundingBox();
+
+	if(animations[ani]->currentFrame == 3)
+	{
+		RenderBoundingBox();
+	}
+	
 
 }
 

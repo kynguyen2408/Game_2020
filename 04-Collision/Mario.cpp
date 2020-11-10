@@ -6,10 +6,37 @@
 #include "Nen.h"
 #include "Stairs.h"
 #include "Goomba.h"
-
-void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+CMario::CMario() : CGameObject()
 {
+	AddAnimation(400);		// idle right
+	AddAnimation(401);		// idle left
 
+	AddAnimation(500);		// walk right
+	AddAnimation(501);		// walk left
+
+	AddAnimation(509);      // jump right
+	AddAnimation(508);		// jump left
+
+	AddAnimation(510);      // sit right
+	AddAnimation(511);		// sit left
+
+	AddAnimation(513);      //hit right
+	AddAnimation(512);      //hit left
+
+	AddAnimation(514);      //hit sit right
+	AddAnimation(515);      //hit sit left
+	//mario->AddAnimation(599);		// die
+
+	untouchable = 0;
+	mario_x = MARIO_X;
+	mario_y = MARIO_Y;
+	whipType = 0;
+}
+	
+
+
+void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+{
 
 	CGameObject::Update(dt);
 	vector<LPGAMEOBJECT> coEventsStatic;
@@ -38,102 +65,109 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	{
 		for (UINT i = 0; i < coEventsStatic.size(); i++)
 		{
-			if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_ITEMS_WHIP2) {
-					whipType = 1;
-				coEventsStatic.at(i)->dead = true;
-			}
-			else if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_ITEMS_WHIP3) {
-				whipType = 2;
-				coEventsStatic.at(i)->dead = true;
-			}
-			else if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_ITEMS_HEART) {
-				DebugOut(L"tang tim");
-				coEventsStatic.at(i)->dead = true;
-			}
-			else if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_ITEMS_AXE) {
-				DebugOut(L"lum riu");
-				coRiu = true; 
-				coEventsStatic.at(i)->dead = true;
-			}
-			if (coEventsStatic.at(i)->type == STAIRS_TYPE)
-			{
 
+			if (coEventsStatic.at(i)->type == NEN_TYPE)
+			{
+				switch (coEventsStatic.at(i)->state)
+				{
+				case CANDLE_STATE_ITEMS_WHIP2:
+					whipType = 1;
+					break;
+				case CANDLE_STATE_ITEMS_WHIP3:
+					whipType = 1;
+					break;
+				case CANDLE_STATE_ITEMS_HEART:
+					whipType = 1;
+					break;
+				case CANDLE_STATE_ITEMS_AXE:
+					coRiu = true;
+					break;
+				default:
+					break;
+
+					coEventsStatic.at(i)->dead = true;
+				}
+
+
+				if (coEventsStatic.at(i)->type == STAIRS_TYPE)
+				{
+
+				}
 			}
 		}
 
-	}
+		//xet vat di chuyen 
+		vector<LPCOLLISIONEVENT> coEventMoving;
+		vector<LPCOLLISIONEVENT> coEventsResultMoving;
 
-	//xet vat di chuyen 
-	vector<LPCOLLISIONEVENT> coEventMoving;
-	vector<LPCOLLISIONEVENT> coEventsResultMoving;
+		coEventMoving.clear();
+		CalcPotentialCollisions(coObjects, coEventMoving);
 
-	coEventMoving.clear();
-	CalcPotentialCollisions(coObjects, coEventMoving);
-	
 
-	if (coEventMoving.size() == 0)
-	{
-		
-	}
-	else
-	{
-	
-		float min_tx, min_ty, nx = 0, ny;
-
-		FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
-		for (UINT i = 0; i < coEventsResultMoving.size(); i++)
+		if (coEventMoving.size() == 0)
 		{
-			LPCOLLISIONEVENT e = coEventsResultMoving[i];
-			if (e->obj->catalog==CATALOG_ENEMY)
+
+		}
+		else
+		{
+
+			float min_tx, min_ty, nx = 0, ny;
+
+			FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
+			for (UINT i = 0; i < coEventsResultMoving.size(); i++)
 			{
-		
-				if (e->ny != 0) //va tram ben tren ben trai
+				LPCOLLISIONEVENT e = coEventsResultMoving[i];
+				if (e->obj->catalog == CATALOG_ENEMY)
 				{
-					if (CGameObject::GetState() != MARIO_STATE_INJURED)
-					{
-						CGameObject::nx = -CGameObject::nx;
-						if (vx <= 0)
-							vx = -0.1;
-						else
-							vx = 0.1;
-						SetState(MARIO_STATE_INJURED);
-					}
-				}
-				else if (e->nx < 0) //va tram vang ben trai
-				{
-					if (CGameObject::GetState() != MARIO_STATE_INJURED)
-					{
-						CGameObject::nx = 1;
-						vx = -0.1;
-						SetState(MARIO_STATE_INJURED);
 
-					}
-				}
-				else if (e->nx > 0) //va tram vang ben phai
-				{
-					if (e->obj->GetState() != MARIO_STATE_INJURED)
+					if (e->ny != 0) //va tram ben tren ben trai
 					{
-						CGameObject::nx = -1;
-						vx = 0.1;
-						SetState(MARIO_STATE_INJURED);
-
-					}
-				}
-				/*else if (e->nx != 0)
-				{
-					if (untouchable==0)
-					{
-						if (goomba->GetState()!=GOOMBA_STATE_DIE)
+						if (CGameObject::GetState() != MARIO_STATE_INJURED)
 						{
-								SetState(MARIO_STATE_DIE);
+							CGameObject::nx = -CGameObject::nx;
+							if (vx <= 0)
+								vx = -0.1;
+							else
+								vx = 0.1;
+							SetState(MARIO_STATE_INJURED);
 						}
 					}
-				}*/
+					else if (e->nx < 0) //va tram vang ben trai
+					{
+						if (CGameObject::GetState() != MARIO_STATE_INJURED)
+						{
+							CGameObject::nx = 1;
+							vx = -0.1;
+							SetState(MARIO_STATE_INJURED);
+
+						}
+					}
+					else if (e->nx > 0) //va tram vang ben phai
+					{
+						if (e->obj->GetState() != MARIO_STATE_INJURED)
+						{
+							CGameObject::nx = -1;
+							vx = 0.1;
+							SetState(MARIO_STATE_INJURED);
+
+						}
+					}
+					/*else if (e->nx != 0)
+					{
+						if (untouchable==0)
+						{
+							if (goomba->GetState()!=GOOMBA_STATE_DIE)
+							{
+									SetState(MARIO_STATE_DIE);
+							}
+						}
+					}*/
+				}
 			}
 		}
-	}
-	for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
+		for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
 
+	}
 }
 
 	
@@ -427,87 +461,3 @@ CMario * CMario::GetInstance()
 	if (__instance == NULL) __instance = new CMario();
 	return __instance;
 }
-//void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
-//{
-//	// Calculate dx, dy 
-//	CGameObject::Update(dt);
-//
-//	// Simple fall down
-//	vy += MARIO_GRAVITY * dt;
-//
-//	vector<LPCOLLISIONEVENT> coEvents;
-//	vector<LPCOLLISIONEVENT> coEventsResult;
-//
-//	coEvents.clear();
-//
-//	// turn off collision when die 
-//	if (state != MARIO_STATE_DIE)
-//		CalcPotentialCollisions(coObjects, coEvents);
-//
-//	// reset untouchable timer if untouchable time has passed
-//	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
-//	{
-//		untouchable_start = 0;
-//		untouchable = 0;
-//	}
-//
-//	// No collision occured, proceed normally
-//	if (coEvents.size() == 0)
-//	{
-//		x += dx;
-//		y += dy;
-//	}
-//	else
-//	{
-//		float min_tx, min_ty, nx = 0, ny;
-//
-//		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-//
-//		// block 
-//		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-//		y += min_ty * dy + ny * 0.4f;
-//
-//		if (nx != 0) vx = 0;
-//		if (ny != 0) vy = 0;
-//
-//		// Collision logic with Goombas
-//		for (UINT i = 0; i < coEventsResult.size(); i++)
-//		{
-//			LPCOLLISIONEVENT e = coEventsResult[i];
-//
-//			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
-//			{
-//				CGoomba *goomba = dynamic_cast<CGoomba *>(e->obj);
-//
-//				// jump on top >> kill Goomba and deflect a bit 
-//				if (e->ny < 0)
-//				{
-//					if (goomba->GetState() != GOOMBA_STATE_DIE)
-//					{
-//						goomba->SetState(GOOMBA_STATE_DIE);
-//						vy = -MARIO_JUMP_DEFLECT_SPEED;
-//					}
-//				}
-//				else if (e->nx != 0)
-//				{
-//					if (untouchable == 0)
-//					{
-//						if (goomba->GetState() != GOOMBA_STATE_DIE)
-//						{
-//							if (level > MARIO_LEVEL_SMALL)
-//							{
-//								level = MARIO_LEVEL_SMALL;
-//								StartUntouchable();
-//							}
-//							else
-//								SetState(MARIO_STATE_DIE);
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	// clean up collision events
-//	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
-//}

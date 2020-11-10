@@ -208,25 +208,6 @@ void LoadResources()
 	animations->LoadResources();
 
 	mario = mario->GetInstance();
-	mario->AddAnimation(400);		// idle right
-	mario->AddAnimation(401);		// idle left
-
-	mario->AddAnimation(500);		// walk right
-	mario->AddAnimation(501);		// walk left
-
-	mario->AddAnimation(509);      // jump right
-	mario->AddAnimation(508);		// jump left
-
-	mario->AddAnimation(510);      // sit right
-	mario->AddAnimation(511);		// sit left
-
-	mario->AddAnimation(513);      //hit right
-	mario->AddAnimation(512);      //hit left
-
-	mario->AddAnimation(514);      //hit sit right
-	mario->AddAnimation(515);      //hit sit left
-	//mario->AddAnimation(599);		// die
-	
 	mario->SetPosition(mario->mario_x, mario->mario_y);
 	objects.push_back(mario);
 
@@ -318,20 +299,6 @@ void Update(DWORD dt)
 		else if (mario->allowCreateWhip == true) //tao roi
 		{
 			roi = new CRoi();
-			if (mario->nx > 0)
-			{
-				roi->AddAnimation(603); // roi phai
-				roi->AddAnimation(604); // roi phai 2
-				roi->AddAnimation(605); // roi phai 3
-			}
-			else
-			{
-				roi->AddAnimation(600); // roi trai
-				roi->AddAnimation(601); // roi trai 2
-				roi->AddAnimation(602); // roi trai 3
-			}
-			roi->animations[0]->isLastFrame = false;
-			roi->animations[0]->currentFrame = -1;
 			objects.push_back(roi);
 		}
 		mario->allowCreateWhip = false;
@@ -366,7 +333,7 @@ void Update(DWORD dt)
 	}
 	
 	mario->vaChamTuong(dt, &wallObjects);
-	aquaman->VaChamDat(dt, &wallObjects);
+	//aquaman->VaChamDat(dt, &wallObjects);
 	if(fire != NULL)
 		fire->VaChamDat(dt, &wallObjects);
 	if(panther!=NULL)

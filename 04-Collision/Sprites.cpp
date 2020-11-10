@@ -92,10 +92,14 @@ void CAnimation::Render(float x, float y, int alpha)
 		{
 			currentFrame++;
 			lastFrameTime = now;
+			if (currentFrame == frames.size() - 1)
+			{
+				isLastFrame = true;
+			}
 			if (currentFrame == frames.size())
 			{
 				currentFrame = 0;
-				isLastFrame = true;
+				
 			}
 
 		}

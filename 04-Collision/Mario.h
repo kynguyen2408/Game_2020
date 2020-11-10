@@ -80,13 +80,8 @@ public:
 	int currentRoi;
 
 	float mario_x, mario_y;
-	CMario() : CGameObject()
-	{
-		untouchable = 0;
-		mario_x = MARIO_X;
-		mario_y = MARIO_Y;
-		whipType = 0;
-	}
+	CMario();
+
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 	void SetState(int state);
