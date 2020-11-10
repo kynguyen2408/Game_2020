@@ -4,7 +4,9 @@
 #include "Mario.h"
 #include "Game.h"
 #include "Nen.h"
+#include "Stairs.h"
 #include "Goomba.h"
+
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 
@@ -26,11 +28,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 
 	// neu co va cham 
+	//k vo va cham 
 	if (coEventsStatic.size() == 0)
 	{
 
 	}
-	//k vo va cham 
+	//co va cham dung yen
 	else
 	{
 		for (UINT i = 0; i < coEventsStatic.size(); i++)
@@ -38,6 +41,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 			if (coEventsStatic.at(i)->type == NEN_TYPE && coEventsStatic.at(i)->state == CANDLE_STATE_2) {
 				//currentRoi = 1;
 				coEventsStatic.at(i)->dead = true;
+			}
+			if (coEventsStatic.at(i)->type == STAIRS_TYPE)
+			{
+
 			}
 		}
 
@@ -64,9 +71,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		for (UINT i = 0; i < coEventsResultMoving.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResultMoving[i];
-			if (dynamic_cast <CGoomba *> (e->obj))
+			if (e->obj->catalog==CATALOG_ENEMY)
 			{
-				CGoomba *goomba = dynamic_cast<CGoomba *> (e->obj);
+		
 				if (e->ny != 0) //va tram ben tren ben trai
 				{
 					if (CGameObject::GetState() != MARIO_STATE_INJURED)
@@ -91,7 +98,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 				else if (e->nx > 0) //va tram vang ben phai
 				{
-					if (goomba->GetState() != GOOMBA_STATE_DIE)
+					if (e->obj->GetState() != MARIO_STATE_INJURED)
 					{
 						CGameObject::nx = -1;
 						vx = 0.1;
@@ -157,19 +164,6 @@ void CMario::Render()
 			else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
 		}
 	}
-	/*else if (vx > 0)
-	{
-			ani = MARIO_ANI_WALKING_RIGHT;
-			if (ny > 0)
-			{
-				if (hitting == true) ani = MARIO_ANI_HIT_RIGHT;
-				else ani = MARIO_ANI_JUMP_RIGHT;
-			}
-			else if (hitting == true)
-			{	
-				ani = MARIO_ANI_HIT_RIGHT;
-			}
-	}*/
 	else
 	{
 		if (nx > 0)
@@ -213,7 +207,6 @@ void CMario::Render()
 			ani = MARIO_ANI_SIT_LEFT;
 	}
 	animations[ani]->Render(x, y, alpha);
-
 	RenderBoundingBox();
 }
 
@@ -268,13 +261,11 @@ void CMario::SetState(int state)
 				animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
 				animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
 			}
-
 			else
 			{
 				animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
 				animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
 				if (ny == 0) vx = 0;
-				
 			}
 		}
 		else
@@ -294,46 +285,8 @@ void CMario::SetState(int state)
 		allowCreateWhip = true;
 		hitting = true;
 		break;
-	case MARIO_STATE_LAUNCH:
-		if (launching == false)
-		{
-			if (nx > 0)
-			{
-				if (ny < 0)
-				{
-					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
-				}
-
-				else
-				{
-					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
-					if (ny == 0) vx = 0;
-
-				}
-			}
-			else
-			{
-				if (ny < 0)
-				{
-					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
-				}
-				else
-				{
-					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
-					if (ny == 0) vx = 0;
-				}
-			}
-			launching = true; //cho phep phong dao
-			allowCreateWhip = true;
-			hitting = true;
-		}
-		break;
 	case MARIO_STATE_THROW:
-		if (throwing == false)
+		if (throwing == false && allowCreateSecondWeapon == true )
 		{
 			if (nx > 0)
 			{
@@ -365,46 +318,10 @@ void CMario::SetState(int state)
 					if (ny == 0) vx = 0;
 				}
 			}
-			throwing = true; //cho phep nem riu
-			allowCreateWhip = true;
-			hitting = true;
-		}
-		break;
-	case MARIO_STATE_BURN:
-		if (throwing == false)
-		{
-			if (nx > 0)
-			{
-				if (ny < 0)
-				{
-					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_SIT_RIGHT]->currentFrame = -1;
-				}
-
-				else
-				{
-					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
-					if (ny == 0) vx = 0;
-
-				}
-			}
+			if(secondWeapon != 0) 
+				throwing = true; //danh vu khi phu.
 			else
-			{
-				if (ny < 0)
-				{
-					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_SIT_LEFT]->currentFrame = -1;
-				}
-				else
-				{
-					animations[MARIO_ANI_HIT_LEFT]->isLastFrame = false;
-					animations[MARIO_ANI_HIT_LEFT]->currentFrame = -1;
-					if (ny == 0) vx = 0;
-				}
-			}
-			burning = true; //cho phep nem riu
-			allowCreateWhip = true;
+				allowCreateWhip = true; //danh roi
 			hitting = true;
 		}
 		break;

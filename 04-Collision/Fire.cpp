@@ -7,17 +7,17 @@ CFire::CFire() {
 	float x_mario, y_mario;
 	mario->GetInstance()->GetPosition(x_mario, y_mario);
 	SetPosition(x_mario, y_mario);
-	AddAnimation(5000);
-	AddAnimation(5001);
+	AddAnimation(5000); //binh`
+	AddAnimation(5001); //lua
 	if (mario->GetInstance()->nx > 0)
 	{
 		vx = FIRE_SPEED;
-		vy = -(FIRE_SPEED + 0.2f);
+		vy = -(FIRE_SPEED - 0.1);
 	}
 	else
 	{
 		vx = -FIRE_SPEED;
-		vy = -(FIRE_SPEED + 0.2f);
+		vy = -(FIRE_SPEED - 0.1);
 	}
 	SetState(FIRE_STATE_NOT_BURN); //set trang thai ban dau la binh`
 	dead = false;
@@ -64,7 +64,8 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		for (UINT i = 0; i < coEvents.size(); i++)
 		{
-			if (coEvents.at(i)->type == GOOMBA_TYPE)
+			if (coEvents.at(i)->catalog == CATALOG_ENEMY)
+	
 			{
 				coEvents.at(i)->dead = true;
 			}
@@ -91,7 +92,6 @@ void CFire::Render()
 	if (state == FIRE_STATE_NOT_BURN)
 		ani = FIRE_ANI_NOT_BURN;
 	else ani = FIRE_ANI_BURN;
-
 	animations[ani]->Render(x, y);
 	RenderBoundingBox();
 }

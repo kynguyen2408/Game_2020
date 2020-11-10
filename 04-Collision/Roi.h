@@ -15,6 +15,7 @@
 #define ROI_TYPE		111
 class CRoi: public CGameObject
 {
+	bool ishitting;
 	void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void Render();

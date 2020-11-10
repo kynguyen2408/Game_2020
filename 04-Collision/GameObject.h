@@ -11,6 +11,11 @@ using namespace std;
 
 #define ID_TEX_BBOX -100		// special texture to draw object bounding box
 
+
+#define CATALOG_ENEMY 1000
+#define CATALOG_WEAPON 70
+
+
 class CGameObject; 
 typedef CGameObject * LPGAMEOBJECT;
 
@@ -51,16 +56,25 @@ public:
 	int type;
 	bool dead;
 
+	int catalog;
 
+	float width;
+	float height;
+	
 	DWORD dt; 
 
 	vector<LPANIMATION> animations;
 
 public: 
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
+	void GetPosition(float& x, float& y) { x = this->x; y = this->y; }
+
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
-	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
-	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
+	void GetSpeed(float& vx, float& vy) { vx = this->vx; vy = this->vy; }
+
+	void SetWH(float width, float height) { this->width = width, this->height = height; }
+	void GetWH(float& width, float& height) { width = this->width; height = this->height; }
+	
 
 	int GetState() { return this->state; }
 
@@ -85,8 +99,8 @@ public:
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom) = 0;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;
-	virtual void SetState(int state) { this->state = state; }
-	virtual void GetState(int &state) { state= this->state; }
+	void SetState(int state) { this->state = state; }
+	void GetState(int &state) { state= this->state; }
 
 	~CGameObject();
 };

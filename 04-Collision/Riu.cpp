@@ -4,6 +4,7 @@
 CRiu::CRiu() {
 
 	type = RIU_TYPE;
+	
 	float x_mario, y_mario;
 	mario->GetInstance()->GetPosition(x_mario, y_mario);
 	SetPosition(x_mario, y_mario);
@@ -63,7 +64,7 @@ void CRiu::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		for (UINT i = 0; i < coEvents.size(); i++)
 		{
-			if (coEvents.at(i)->type == GOOMBA_TYPE)
+			if (coEvents.at(i)->catalog == CATALOG_ENEMY)
 			{
 				coEvents.at(i)->dead = true;
 				dead = true;

@@ -30,12 +30,14 @@
 #include "Mario.h"
 #include "Brick.h"
 #include "Goomba.h"
+#include "Panther.h"
 #include "Roi.h"
 #include "Dao.h"
 #include "Riu.h"
 #include "Fire.h"
 #include "Map.h"
 #include "Nen.h"
+#include "Stairs.h"
 #include "Camera.h"
 
 #define WINDOW_CLASS_NAME L"SampleWindow"
@@ -59,12 +61,12 @@ CGame *game;
 
 CMario *mario;
 CGoomba *goomba;
+CPanther* panther;
 CRoi* roi;
-CDao* dao;
-CRiu* riu;
 CFire* fire;
 Map* map;
 Nen* nen;
+CStairs* stairs;
 CCamera* camera;
 vector<LPGAMEOBJECT> objects;
 CMario * CMario::__instance = NULL;
@@ -88,11 +90,14 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 			mario->SetState(MARIO_STATE_JUMP);
 		break;
 	case DIK_A:
-		if (game->IsKeyDown(DIK_UP))
+		if (game->IsKeyDown(DIK_UP) && game->IsKeyDown(DIK_DOWN)==NULL)
 		{
 			DebugOut(L"[INFO] A danh: %d\n", KeyCode);
 			if (mario->hitting == false)
-				mario->SetState(MARIO_STATE_LAUNCH);
+			{
+				if (mario->allowCreateSecondWeapon == true) mario->SetState(MARIO_STATE_THROW);
+				else mario->SetState(MARIO_STATE_HIT);
+			}
 		}
 		else
 		{
@@ -101,15 +106,17 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 				mario->SetState(MARIO_STATE_HIT);
 		}
 		break;
-	case DIK_S:
-		DebugOut(L"[INFO] S: %d\n", KeyCode);
-		if (mario->hitting == false)
-			mario->SetState(MARIO_STATE_THROW);
+	case DIK_1:
+		DebugOut(L"[INFO] 1: %d\n", KeyCode);
+		mario->secondWeapon = DAO_TYPE;
 		break;
-	case DIK_D:
-		DebugOut(L"[INFO] D: %d\n", KeyCode);
-		if (mario->hitting == false)
-			mario->SetState(MARIO_STATE_BURN);
+	case DIK_2:
+		DebugOut(L"[INFO] 2: %d\n", KeyCode);
+		mario->secondWeapon = RIU_TYPE;
+		break;
+	case DIK_3:
+		DebugOut(L"[INFO] 3: %d\n", KeyCode);
+		mario->secondWeapon = FIRE_TYPE;
 		break;
 	}
 }
@@ -142,7 +149,12 @@ void CSampleKeyHander::KeyState(BYTE *states)
 		{
 			if (game->IsKeyDown(DIK_RIGHT)) mario->SetState(MARIO_STATE_SIT_RIGHT);
 			else if (game->IsKeyDown(DIK_LEFT)) mario->SetState(MARIO_STATE_SIT_LEFT);
-			else if (game->IsKeyDown(DIK_UP)) mario->SetState(MARIO_STATE_IDLE);
+			else if (game->IsKeyDown(DIK_UP))
+			{
+				mario->SetState(MARIO_STATE_IDLE);
+				mario->allowCreateSecondWeapon == false;
+
+			}
 			else mario->SetState(MARIO_STATE_SIT);
 		}
 		else
@@ -181,7 +193,6 @@ void LoadResources()
 
 	textures->Add(ID_TEX_MARIO, L"textures\\simon.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(ID_TEX_ENEMY, L"textures\\Enemies.png", D3DCOLOR_XRGB(255, 0, 255));
-	textures->Add(ID_TEX_MISC, L"textures\\misc.png", D3DCOLOR_XRGB(176, 224, 248));
 	textures->Add(ID_TEX_ROI, L"textures\\morningstar.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(ID_TEX_DAO, L"textures\\Sub_weapons.png", D3DCOLOR_XRGB(255, 0, 255));
 	textures->Add(ID_TEX_NEN, L"textures\\Static_Obj.png", D3DCOLOR_XRGB(176, 224, 24));
@@ -237,16 +248,25 @@ void LoadResources()
 
 
 	LPDIRECT3DTEXTURE9 texEnemy = textures->Get(ID_TEX_ENEMY);
+	//ghost
 	sprites->Add(20001, 255, 0, 288, 64, texEnemy);
 	sprites->Add(20002, 292, 0, 324, 64, texEnemy);
 
 	sprites->Add(20011, 362, 0, 392, 64, texEnemy);
 	sprites->Add(20012, 324, 0, 356, 64, texEnemy);
 
-	//sprites->Add(30003, 45, 21, 61, 29, texEnemy); // die sprite
+	//Panther
+	sprites->Add(20003, 464, 66, 510, 95, texEnemy);
 
-	LPDIRECT3DTEXTURE9 texMisc = textures->Get(ID_TEX_MISC);
-	sprites->Add(30001, 408, 225, 424, 241, texMisc);
+	sprites->Add(20004, 392, 64, 447, 95, texEnemy);
+	sprites->Add(20005, 324, 64, 383, 95, texEnemy);
+	sprites->Add(20006, 256, 66, 319, 91, texEnemy);
+
+	sprites->Add(20013, 0, 66, 47, 95, texEnemy);
+
+	sprites->Add(20014, 64, 64, 119, 95, texEnemy);
+	sprites->Add(20015, 128, 64, 187, 95, texEnemy);
+	sprites->Add(20016, 192, 66, 255, 91, texEnemy);
 
 	LPDIRECT3DTEXTURE9 texRoi = textures->Get(ID_TEX_ROI);
 
@@ -355,7 +375,7 @@ void LoadResources()
 
 	
 
-	ani = new CAnimation(300);		// Goomba walk
+	ani = new CAnimation(100);		// Goomba walk
 	ani->Add(20001);
 	ani->Add(20002);
 	animations->Add(801, ani);
@@ -365,9 +385,25 @@ void LoadResources()
 	ani->Add(20012);
 	animations->Add(800, ani);
 
-	ani = new CAnimation(1000);		// Goomba dead
-	ani->Add(30001);
-	animations->Add(802, ani);
+	ani = new CAnimation(100);		// Panther right
+	ani->Add(20003);
+	animations->Add(910, ani);
+
+	ani = new CAnimation(100);		// Panther left
+	ani->Add(20013);
+	animations->Add(911, ani);
+
+	ani = new CAnimation(100);		// Panther run right
+	ani->Add(20004);
+	ani->Add(20005);
+	ani->Add(20006);
+	animations->Add(900, ani);
+
+	ani = new CAnimation(100);		// Panther run left
+	ani->Add(20014);
+	ani->Add(20015);
+	ani->Add(20016);
+	animations->Add(901, ani);
 
 	ani = new CAnimation(100);   //roi phai
 	ani->Add(40004, 10);	// frame trống
@@ -401,7 +437,7 @@ void LoadResources()
 	ani->Add(50013);
 	animations->Add(4001, ani);
 
-	ani = new CAnimation(300); //lua binh`
+	ani = new CAnimation(100); //lua binh`
 	ani->Add(50004);
 	animations->Add(5000, ani);
 
@@ -433,34 +469,45 @@ void LoadResources()
 	mario->SetPosition(mario->mario_x, mario->mario_y);
 	objects.push_back(mario);
 
-	
+	//gach duoi dat
+	CBrick* brick = new CBrick();
+	brick->SetPosition(0, 368);
+	brick->SetWH(2000, BRICK_HEIGHT);
+	objects.push_back(brick);
 
+	//gach tren
+	CBrick* brick1 = new CBrick();
+	brick1->SetPosition(400, 280);
+	brick1->SetWH(280, BRICK_HEIGHT);
+	objects.push_back(brick1);
 
-	for (int i = 0; i < 1; i++)
-	{
-		CBrick *brick = new CBrick();
-		brick->SetPosition(0 + i*16.0f, 384);
-		objects.push_back(brick);
-	}
-
-	//// and Goombas 
-	for (int i = 0; i < 4; i++)
+	// Goombas 
+	/*for (int i = 0; i < 4; i++)
 	{
 		goomba = new CGoomba();
 		goomba->AddAnimation(800);
 		goomba->AddAnimation(801);
 		goomba->AddAnimation(802);
-		goomba->SetPosition(200 + i*60, 322);
+		goomba->SetPosition(400 + i*60, 306);
 		goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
 		objects.push_back(goomba);
-	}
+	}*/
+	// Panther
+	panther = new CPanther();
+	panther->SetPosition(500, 250);
+	objects.push_back(panther);
+
 	//nen
 	Nen *nen = new Nen();
 	nen->AddAnimation(902);
 	nen->AddAnimation(400);
 	nen->SetPosition(400 + 0 * 16.0f, 320);
 	objects.push_back(nen);
-	
+	// Cau thang
+	CStairs* stairs = new CStairs();
+	stairs->SetPosition(300, 300);
+	objects.push_back(stairs);
+
 	//tao camera
 	camera = camera->GetInstance();
 }
@@ -483,30 +530,30 @@ void Update(DWORD dt)
 		}
 		else coObjects.push_back(objects[i]);
 	}
-	if (mario->hitting == true && mario->allowCreateWhip==true )
+
+	if (mario->hitting == true )
 	{
 		float x, y;
 
 		mario->GetPosition(x, y);
-		if (mario->launching == true)
-		{ 
-				dao = new CDao();
-				objects.push_back(dao);
-				mario->launching = false;
-		}
-		else if (mario->throwing == true)
+		if (mario->throwing == true && mario->allowCreateSecondWeapon==true && mario->secondWeapon!=0) //tao vu khi phu.
 		{
-			riu = new CRiu();
-			objects.push_back(riu);
+			if(mario->secondWeapon	== DAO_TYPE)
+			{
+				objects.push_back(new CDao());
+			}
+			else if (mario->secondWeapon == RIU_TYPE)
+			{
+				objects.push_back(new CRiu());
+			}
+			else if (mario->secondWeapon == FIRE_TYPE) {
+				fire = new CFire();
+				objects.push_back(fire);
+			}
 			mario->throwing = false;
+			mario->allowCreateSecondWeapon = false;
 		}
-		else if (mario->burning == true)
-		{
-			fire = new CFire();
-			objects.push_back(fire);
-			mario->burning = false;
-		}
-		else
+		else if (mario->allowCreateWhip == true) //tao roi
 		{
 			roi = new CRoi();
 			if (mario->nx > 0)
@@ -523,6 +570,7 @@ void Update(DWORD dt)
 			objects.push_back(roi);
 		}
 		mario->allowCreateWhip = false;
+
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
@@ -530,15 +578,18 @@ void Update(DWORD dt)
 	}
 	for (int i = 0; i < objects.size(); i++)
 	{
-		if (objects[i]->dead == true)
+		if (objects[i]->dead == true) {
+			// cho phep tao ra vu khi phu. 1 lan`
+			if (objects[i]->type == RIU_TYPE || objects[i]->type == DAO_TYPE || objects[i]->type == FIRE_TYPE)
+				mario->allowCreateSecondWeapon = true;
 			objects.erase(objects.begin() + i);
+		}
 	}
-	
-
-	
 	mario->vaChamTuong(dt, &wallObjects);
 	if(fire != NULL)
 		fire->VaChamDat(dt, &wallObjects);
+	if(panther!=NULL)
+		panther->VaChamDat(dt, &wallObjects);
 
 
 

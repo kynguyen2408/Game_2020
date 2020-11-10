@@ -19,6 +19,7 @@
 
 #define GOOMBA_TYPE 13
 
+
 class CGoomba : public CGameObject
 {
 	void GetBoundingBox(float &left, float &top, float &right, float &bottom);

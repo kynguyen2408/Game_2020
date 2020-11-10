@@ -36,10 +36,6 @@
 #define MARIO_ANI_HIT_LEFT			9
 #define MARIO_ANI_HIT_SIT_RIGHT		10
 #define MARIO_ANI_HIT_SIT_LEFT		11
-#define MARIO_ANI_LAUNCH_RIGHT		12
-#define MARIO_ANI_LAUNCH_LEFT		13
-#define MARIO_ANI_THROW_RIGHT		14
-#define MARIO_ANI_THROW_LEFT		15
 
 #define MARIO_ANI_DIE				16
 
@@ -65,11 +61,11 @@ public:
 	boolean jumping = false;
 	boolean sitting = false;
 	boolean hitting = false;
-	boolean launching = false;
+	int secondWeapon = 0;
 	boolean throwing = false;
-	boolean burning = false;
 	boolean injured = false;
 	boolean allowCreateWhip = false;
+	boolean allowCreateSecondWeapon = true;
 	int currentRoi;
 
 	float mario_x, mario_y;
