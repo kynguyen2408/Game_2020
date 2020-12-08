@@ -99,7 +99,7 @@ public:
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom) = 0;
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;
-	void SetState(int state) { this->state = state; }
+	virtual void SetState(int state) { this->state = state; }
 	void GetState(int &state) { state= this->state; }
 
 	~CGameObject();

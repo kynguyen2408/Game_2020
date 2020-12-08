@@ -94,7 +94,7 @@ void CSampleKeyHander::OnKeyDown(int KeyCode)
 	{
 	case DIK_SPACE:
 		DebugOut(L"[INFO] Space: %d\n", KeyCode);
-		if (mario->sitting == false)
+		if (mario->sitting == false && mario->uppingRight == false && mario->uppingLeft == false)
 			mario->SetState(MARIO_STATE_JUMP);
 		break;
 	case DIK_A:
@@ -137,38 +137,81 @@ void CSampleKeyHander::OnKeyUp(int KeyCode)
 void CSampleKeyHander::KeyState(BYTE *states)
 {
 	// disable control key when Mario die 
-	if (mario->jumping == false && mario->hitting==false && mario->injured==false)
+	if (mario->jumping == false && mario->hitting==false && mario->injured==false )
 	{
 		if (game->IsKeyDown(DIK_RIGHT))
 		{
-			if (game->IsKeyDown(DIK_DOWN))
+			if (game->IsKeyDown(DIK_DOWN) && !mario->uppingLeft && !mario->uppingRight)
 				mario->SetState(MARIO_STATE_SIT_RIGHT);
-			else if (game->IsKeyDown(DIK_LEFT)) mario->SetState(MARIO_STATE_IDLE);
+			else if (game->IsKeyDown(DIK_LEFT))
+			{
+				if (mario->uppingRight) mario->SetState(MARIO_STATE_STAND_STAIRS);
+				mario->SetState(MARIO_STATE_IDLE);
+			}
+			else if (mario->uppingRight) mario->SetState(MARIO_STATE_UPSTAIRS_RIGHT);
+			else if (mario->uppingLeft) mario->SetState(MARIO_STATE_DOWNSTAIRS_LEFT);
 			else mario->SetState(MARIO_STATE_WALKING_RIGHT);
 		}
 		else if (game->IsKeyDown(DIK_LEFT))
 		{
-			if (game->IsKeyDown(DIK_DOWN))
-				mario->SetState(MARIO_STATE_SIT_LEFT);
-			else if (game->IsKeyDown(DIK_RIGHT)) mario->SetState(MARIO_STATE_IDLE);
+			if (game->IsKeyDown(DIK_DOWN) && !mario->uppingLeft && !mario->uppingRight)
+					mario->SetState(MARIO_STATE_SIT_LEFT);
+			/*else if (game->IsKeyDown(DIK_RIGHT))
+			{	
+				if(mario->upping) mario->SetState(MARIO_STATE_STAND_STAIRS);
+				else mario->SetState(MARIO_STATE_IDLE);
+			}*/
+			else if (mario->uppingRight) mario->SetState(MARIO_STATE_DOWNSTAIRS_RIGHT);
+			else if (mario->uppingLeft) mario->SetState(MARIO_STATE_UPSTAIRS_LEFT);
 			else mario->SetState(MARIO_STATE_WALKING_LEFT);
 		}
 		else if (game->IsKeyDown(DIK_DOWN))
 		{
-			if (game->IsKeyDown(DIK_RIGHT)) mario->SetState(MARIO_STATE_SIT_RIGHT);
-			else if (game->IsKeyDown(DIK_LEFT)) mario->SetState(MARIO_STATE_SIT_LEFT);
+			if (mario->allowDownStairsRight == true)
+			{
+				mario->SetState(MARIO_STATE_DOWNSTAIRS_RIGHT);
+				DebugOut(L"di xuong");
+			}
+				
+			else if (mario->allowDownStairsLeft == true)
+				mario->SetState(MARIO_STATE_DOWNSTAIRS_LEFT);
+			else if (game->IsKeyDown(DIK_RIGHT)) 
+				mario->SetState(MARIO_STATE_SIT_RIGHT);
+			else if (game->IsKeyDown(DIK_LEFT))
+				mario->SetState(MARIO_STATE_SIT_LEFT);
 			else if (game->IsKeyDown(DIK_UP))
 			{
-				mario->SetState(MARIO_STATE_IDLE);
-				mario->allowCreateSecondWeapon == false;
-
+				if (mario->uppingRight) mario->SetState(MARIO_STATE_STAND_STAIRS);
+				else mario->SetState(MARIO_STATE_IDLE);
+				mario->allowCreateSecondWeapon = false;
 			}
-			else mario->SetState(MARIO_STATE_SIT);
+			else if (mario->uppingRight) mario->SetState(MARIO_STATE_DOWNSTAIRS_RIGHT);
+			else if (mario->uppingLeft) mario->SetState(MARIO_STATE_DOWNSTAIRS_LEFT);
+			else {
+				DebugOut(L"ngoi ");
+
+				mario->SetState(MARIO_STATE_SIT);
+			}
+		}
+		else if (game->IsKeyDown(DIK_UP))
+		{
+			if (mario->allowUpStairsRight == true )
+				mario->SetState(MARIO_STATE_UPSTAIRS_RIGHT);
+			else if(mario->allowUpStairsLeft == true)
+				mario->SetState(MARIO_STATE_UPSTAIRS_LEFT);
+			else if (mario->uppingRight) mario->SetState(MARIO_STATE_UPSTAIRS_RIGHT);
+			else if (mario->uppingLeft) mario->SetState(MARIO_STATE_UPSTAIRS_LEFT);
+			else mario->SetState(MARIO_STATE_IDLE);
 		}
 		else
 		{
-			if(mario->GetState() != MARIO_STATE_INJURED || mario->vy > 0)
+			if(mario->GetState() != MARIO_STATE_INJURED || mario->vy > 0 )
 				mario->SetState(MARIO_STATE_IDLE);
+			if (mario->uppingRight || mario->uppingLeft)
+			{
+				mario->SetState(MARIO_STATE_STAND_STAIRS);
+			}
+				
 		}
 	}
 }
@@ -229,27 +272,33 @@ void LoadResources()
 	/*for (int i = 0; i < 4; i++)
 	{
 		goomba = new CGoomba();
-		goomba->AddAnimation(800);
-		goomba->AddAnimation(801);
-		goomba->AddAnimation(802);
 		goomba->SetPosition(400 + i*60, 306);
 		goomba->SetState(GOOMBA_STATE_WALKING_LEFT);
 		objects.push_back(goomba);
 	}*/
 	// Panther
-	panther = new CPanther();
+	/*panther = new CPanther();
 	panther->SetPosition(500, 250);
-	objects.push_back(panther);
+	objects.push_back(panther);*/
 
 	//nen
 	Nen *nen = new Nen();
 	nen->setTypeItems(NEN_ANI_ITEM_AXE);
-	nen->SetPosition(100 + 0 * 16.0f, 320);
+	nen->SetPosition(100 + 0 * 16.0f, 300);
 	objects.push_back(nen);
+
 	// Cau thang
-	CStairs* stairs = new CStairs();
-	stairs->SetPosition(300, 300);
+	CStairs* stairs = new CStairs(STAIRS_RIGHT_UP);
+	stairs->SetPosition(300, 366);
 	objects.push_back(stairs);
+
+	CStairs* stairs1 = new CStairs(STAIRS_RIGHT_DOWN);
+	stairs1->SetPosition(350, 200);
+	objects.push_back(stairs1);
+
+	CStairs* stairs2 = new CStairs(STAIRS_LEFT_UP);
+	stairs2->SetPosition(900, 325);
+	objects.push_back(stairs2);
 
 	//tao camera
 	camera = camera->GetInstance();
@@ -271,6 +320,7 @@ void Update(DWORD dt)
 		if (objects[i]->type == BRICK_TYPE) {
 			wallObjects.push_back(objects[i]);
 		}
+
 		else coObjects.push_back(objects[i]);
 	}
 

@@ -22,7 +22,13 @@
 #define MARIO_STATE_THROW			900
 #define MARIO_STATE_BURN			1000
 #define MARIO_STATE_INJURED			1100
-#define MARIO_STATE_DIE				1200
+#define MARIO_STATE_UPSTAIRS_RIGHT	1200
+#define MARIO_STATE_UPSTAIRS_LEFT	1300
+#define MARIO_STATE_STAND_STAIRS	1400
+#define MARIO_STATE_DOWNSTAIRS_RIGHT 1500
+#define MARIO_STATE_DOWNSTAIRS_LEFT 1600
+#define MARIO_STATE_HIT_STAIRS		1700
+#define MARIO_STATE_DIE				1800
 
 #define MARIO_ANI_IDLE_RIGHT		0
 #define MARIO_ANI_IDLE_LEFT			1
@@ -36,8 +42,20 @@
 #define MARIO_ANI_HIT_LEFT			9
 #define MARIO_ANI_HIT_SIT_RIGHT		10
 #define MARIO_ANI_HIT_SIT_LEFT		11
+#define MARIO_ANI_UPSTAIRS_RIGHT	12
+#define MARIO_ANI_UPSTAIRS_LEFT		13
+#define MARIO_ANI_STAND_STAIRS_UP_RIGHT		14
+#define MARIO_ANI_STAND_STAIRS_UP_LEFT		15
+#define MARIO_ANI_DOWNSTAIRS_RIGHT			16
+#define MARIO_ANI_DOWNSTAIRS_LEFT			17
+#define MARIO_ANI_STAND_STAIRS_DOWN_RIGHT	18
+#define MARIO_ANI_STAND_STAIRS_DOWN_LEFT	19
+#define MARIO_ANI_HIT_STAIRS_UP_RIGHT		20
+#define MARIO_ANI_HIT_STAIRS_UP_LEFT		21
+#define MARIO_ANI_HIT_STAIRS_DOWN_RIGHT		22
+#define MARIO_ANI_HIT_STAIRS_DOWN_LEFT		23
 
-#define MARIO_ANI_DIE				16
+#define MARIO_ANI_DIE				24
 
 #define	MARIO_TYPE 11
 
@@ -61,10 +79,17 @@ public:
 	boolean jumping = false;
 	boolean sitting = false;
 	boolean hitting = false;
+	boolean hitting_stairs = false;
+	boolean uppingRight = false;
+	boolean uppingLeft = false;
 	int secondWeapon = 0;
 	boolean throwing = false;
 	boolean injured = false;
 	boolean allowCreateWhip = false;
+	boolean allowUpStairsRight = false;
+	boolean allowUpStairsLeft = false;
+	boolean allowDownStairsRight = false;
+	boolean allowDownStairsLeft = false;
 	boolean isBringItems = false;
 	boolean coRiu = false;
 	int whipType;	// type of whip 1,2,3 

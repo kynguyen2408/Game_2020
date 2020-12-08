@@ -4,6 +4,8 @@ CGoomba::CGoomba()
 	type = GOOMBA_TYPE;
 	catalog = CATALOG_ENEMY;
 	dead = false;
+	AddAnimation(902);
+	AddAnimation(901);
 }
 
 void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &bottom)

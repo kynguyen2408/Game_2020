@@ -9,8 +9,11 @@ void CStairs::GetBoundingBox(float& left, float& top, float& right, float& botto
 }
 CStairs::CStairs()
 {
-	type = STAIRS_TYPE;
-
+	
+}
+CStairs::CStairs(int t)
+{
+	type = t;
 }
 void CStairs::Render()
 {

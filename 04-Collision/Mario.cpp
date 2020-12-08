@@ -25,6 +25,25 @@ CMario::CMario() : CGameObject()
 
 	AddAnimation(514);      //hit sit right
 	AddAnimation(515);      //hit sit left
+
+	AddAnimation(520);      //walking up stairs right
+	AddAnimation(521);      //walking up stairs left
+
+	AddAnimation(518);		//STANDING_STAIR_UP_RIGHT
+	AddAnimation(519);		//STANDING_STAIR_UP_LEFT
+
+	AddAnimation(524);      //walking down stairs right
+	AddAnimation(525);      //walking down stairs left
+
+	AddAnimation(522);		//STANDING_STAIR_DOWN_RIGHT
+	AddAnimation(523);		//STANDING_STAIR_DOWN_LEFT
+
+	AddAnimation(526);		//HITTING_STAIR_UP_RIGHT
+	AddAnimation(527);		//HITTING_STAIR_UP_LEFT
+
+	AddAnimation(528);		//HITTING_STAIR_DOWN_RIGHT
+	AddAnimation(529);		//HITTING_STAIR_DOWN_LEFT
+
 	//mario->AddAnimation(599);		// die
 
 	untouchable = 0;
@@ -58,7 +77,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//k vo va cham 
 	if (coEventsStatic.size() == 0)
 	{
-
+		
 	}
 	//co va cham dung yen
 	else
@@ -84,15 +103,33 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					break;
 				default:
 					break;
-
-					coEventsStatic.at(i)->dead = true;
+				coEventsStatic.at(i)->dead = true;
 				}
-
-
-				if (coEventsStatic.at(i)->type == STAIRS_TYPE)
+			}
+			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_UP)
+			{
+				allowUpStairsRight = true;
+				allowDownStairsRight = false;
+				if (uppingRight )
 				{
-
+					uppingRight = false;
+				}	
+			
+			}
+			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
+			{
+				allowDownStairsRight = true;
+				allowUpStairsRight = false;
+				if (uppingRight)
+				{
+					uppingRight = false;
 				}
+				
+			}
+			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
+			{
+				if (uppingLeft) uppingLeft = false;
+				else allowUpStairsLeft = true;
 			}
 		}
 
@@ -171,10 +208,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 }
 
 	
-	
-
-
-
 void CMario::Render()
 {
 	int ani;
@@ -185,7 +218,10 @@ void CMario::Render()
 			ani = MARIO_ANI_IDLE_RIGHT;
 			if (ny > 0)
 			{
-				if (hitting == true) ani = MARIO_ANI_HIT_RIGHT;
+				if (hitting == true)
+				{
+					ani = MARIO_ANI_HIT_RIGHT;
+				}
 				else ani = MARIO_ANI_JUMP_RIGHT;
 			}
 			else if (ny == -1)
@@ -193,7 +229,19 @@ void CMario::Render()
 				if (hitting == true) ani = MARIO_ANI_HIT_SIT_RIGHT;
 				else ani = MARIO_ANI_SIT_RIGHT;
 			}
-			else if (hitting == true ) ani = MARIO_ANI_HIT_RIGHT;
+			else if (hitting == true)
+			{
+				if (uppingRight == true) 
+					ani = MARIO_ANI_HIT_STAIRS_UP_RIGHT;
+				else if (uppingLeft == true)
+					ani = MARIO_ANI_HIT_STAIRS_DOWN_RIGHT;
+				else ani = MARIO_ANI_HIT_RIGHT;
+			}
+			else if (uppingRight == true)
+			{	
+				ani = MARIO_ANI_STAND_STAIRS_UP_RIGHT;
+			}
+			else if (uppingLeft == true) ani = MARIO_ANI_STAND_STAIRS_DOWN_RIGHT;
 		}
 		else
 		{
@@ -208,7 +256,16 @@ void CMario::Render()
 				if (hitting == true) ani = MARIO_ANI_HIT_SIT_LEFT;
 				else ani = MARIO_ANI_SIT_LEFT;
 			}
-			else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
+			else if (hitting == true)
+			{
+				if (uppingRight == true)
+					ani = MARIO_ANI_HIT_STAIRS_DOWN_LEFT;
+				else if (uppingLeft == true)
+					ani = MARIO_ANI_HIT_STAIRS_UP_LEFT;
+				else ani = MARIO_ANI_HIT_LEFT;
+			}
+			else if (uppingRight == true) ani = MARIO_ANI_STAND_STAIRS_DOWN_LEFT;
+			else if (uppingLeft == true) ani = MARIO_ANI_STAND_STAIRS_UP_LEFT;
 		}
 	}
 	else
@@ -218,12 +275,28 @@ void CMario::Render()
 			ani = MARIO_ANI_WALKING_RIGHT;
 			if (ny > 0)
 			{
-				if (hitting == true) ani = MARIO_ANI_HIT_RIGHT;
+				if (hitting == true)
+				{
+					 ani = MARIO_ANI_HIT_RIGHT;
+				}
 				else ani = MARIO_ANI_JUMP_RIGHT;
+
 			}
 			else if (hitting == true)
 			{
-				ani = MARIO_ANI_HIT_RIGHT;
+				if (uppingRight == true)
+					ani = MARIO_ANI_HIT_STAIRS_UP_RIGHT;
+				else if (uppingLeft == true)
+					ani = MARIO_ANI_HIT_STAIRS_DOWN_RIGHT;
+				else ani = MARIO_ANI_HIT_RIGHT;
+			}
+			else if (uppingRight == true)
+			{
+				ani = MARIO_ANI_UPSTAIRS_RIGHT;
+			}
+			else if (uppingLeft == true)
+			{
+				ani = MARIO_ANI_DOWNSTAIRS_RIGHT;
 			}
 		}
 		else
@@ -234,7 +307,22 @@ void CMario::Render()
 				if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
 				else ani = MARIO_ANI_JUMP_LEFT;
 			}
-			else if (hitting == true) ani = MARIO_ANI_HIT_LEFT;
+			else if (hitting == true)
+			{
+				if (uppingRight == true)
+					ani = MARIO_ANI_HIT_STAIRS_DOWN_LEFT;
+				else if (uppingLeft == true)
+					ani = MARIO_ANI_HIT_STAIRS_UP_LEFT;
+				else ani = MARIO_ANI_HIT_LEFT;
+			}
+			else if (uppingRight == true)
+			{
+				ani = MARIO_ANI_DOWNSTAIRS_LEFT;
+			}
+			else if (uppingLeft == true)
+			{
+				ani = MARIO_ANI_UPSTAIRS_LEFT;
+			}
 		}
 		
 	}
@@ -252,6 +340,8 @@ void CMario::Render()
 			ani = MARIO_ANI_SIT_RIGHT;
 		else if (ani == MARIO_ANI_HIT_SIT_LEFT)
 			ani = MARIO_ANI_SIT_LEFT;
+		else if (ani == MARIO_ANI_HIT_STAIRS_UP_RIGHT)
+			ani = MARIO_ANI_STAND_STAIRS_UP_RIGHT;
 	}
 	animations[ani]->Render(x, y, alpha);
 	RenderBoundingBox();
@@ -303,6 +393,20 @@ void CMario::SetState(int state)
 	case MARIO_STATE_HIT:
 		if (nx > 0)
 		{
+			if (uppingRight == true)
+			{
+				animations[MARIO_ANI_HIT_STAIRS_UP_RIGHT]->isLastFrame = false;
+				animations[MARIO_ANI_HIT_STAIRS_UP_RIGHT]->currentFrame = -1;
+				vx = 0;
+				vy = 0;
+			}
+			if (uppingLeft == true)
+			{
+				animations[MARIO_ANI_HIT_STAIRS_DOWN_RIGHT]->isLastFrame = false;
+				animations[MARIO_ANI_HIT_STAIRS_DOWN_RIGHT]->currentFrame = -1;
+				vx = 0;
+				vy = 0;
+			}
 			if (ny < 0)
 			{
 				animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
@@ -310,13 +414,27 @@ void CMario::SetState(int state)
 			}
 			else
 			{
-				animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
-				animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
-				if (ny == 0) vx = 0;
+					animations[MARIO_ANI_HIT_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_RIGHT]->currentFrame = -1;
+					if (ny == 0) vx = 0;
 			}
 		}
 		else
 		{
+			if (uppingRight == true)
+			{
+				animations[MARIO_ANI_HIT_STAIRS_DOWN_LEFT]->isLastFrame = false;
+				animations[MARIO_ANI_HIT_STAIRS_DOWN_LEFT]->currentFrame = -1;
+				vx = 0;
+				vy = 0;
+			}
+			if (uppingLeft == true)
+			{
+				animations[MARIO_ANI_HIT_STAIRS_UP_LEFT]->isLastFrame = false;
+				animations[MARIO_ANI_HIT_STAIRS_UP_LEFT]->currentFrame = -1;
+				vx = 0;
+				vy = 0;
+			}
 			if (ny < 0)
 			{
 				animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
@@ -337,6 +455,20 @@ void CMario::SetState(int state)
 		{
 			if (nx > 0)
 			{
+				if (uppingRight == true)
+				{
+					animations[MARIO_ANI_HIT_STAIRS_UP_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_STAIRS_UP_RIGHT]->currentFrame = -1;
+					vx = 0;
+					vy = 0;
+				}
+				if (uppingLeft == true)
+				{
+					animations[MARIO_ANI_HIT_STAIRS_DOWN_RIGHT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_STAIRS_DOWN_RIGHT]->currentFrame = -1;
+					vx = 0;
+					vy = 0;
+				}
 				if (ny < 0)
 				{
 					animations[MARIO_ANI_HIT_SIT_RIGHT]->isLastFrame = false;
@@ -353,6 +485,20 @@ void CMario::SetState(int state)
 			}
 			else
 			{
+				if (uppingRight == true)
+				{
+					animations[MARIO_ANI_HIT_STAIRS_DOWN_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_STAIRS_DOWN_LEFT]->currentFrame = -1;
+					vx = 0;
+					vy = 0;
+				}
+				if (uppingLeft == true)
+				{
+					animations[MARIO_ANI_HIT_STAIRS_UP_LEFT]->isLastFrame = false;
+					animations[MARIO_ANI_HIT_STAIRS_UP_LEFT]->currentFrame = -1;
+					vx = 0;
+					vy = 0;
+				}
 				if (ny < 0)
 				{
 					animations[MARIO_ANI_HIT_SIT_LEFT]->isLastFrame = false;
@@ -379,6 +525,38 @@ void CMario::SetState(int state)
 			injured = true;
 		}
 		break;
+	case MARIO_STATE_UPSTAIRS_RIGHT:
+		nx = 1;
+		ny = 0;
+		vx = 0.05;
+		vy = -0.05;
+		uppingRight = true;
+		break;
+	case MARIO_STATE_UPSTAIRS_LEFT:
+		nx = -1;
+		vx = -0.05;
+		vy = -0.05;
+		uppingLeft = true;
+		break;
+	case MARIO_STATE_DOWNSTAIRS_RIGHT:
+		nx = -1;
+		vx = -0.05;
+		vy = 0.05;
+		uppingRight = true;
+		break;
+	case MARIO_STATE_DOWNSTAIRS_LEFT:
+		nx = 1;
+		vx = 0.05;
+		vy = 0.05;
+		uppingLeft = true;
+		break;
+	case MARIO_STATE_STAND_STAIRS:
+		vx = 0;
+		vy = 0;
+		if (allowUpStairsRight || allowDownStairsRight)
+			uppingRight = true;
+		else uppingLeft = true;
+		break;
 	case MARIO_STATE_IDLE:
 		sitting = false;
 		vx = 0;
@@ -389,12 +567,19 @@ void CMario::SetState(int state)
 
 void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 {
-	
-	left = x;
+	if (nx > 0)
+	{
+		left = x + 16;
+		right = x + 48;
+	}
+	else
+	{
+		left = x + 12;
+		right = x + 44;
+	}
 	if (sitting || (jumping && !hitting))
 		top = y + 17;
 	else top = y;
-	right = x + 32;
 	bottom = y + 60;
 	
 }
@@ -405,16 +590,18 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
 	CGameObject::Update(dt);
-	vy += MARIO_GRAVITY * dt;
+	if(!uppingRight && !uppingLeft)
+		vy +=MARIO_GRAVITY * dt;
 	coEvents.clear();
 
 	// turn off collision when die 
 	CalcPotentialCollisions(coObjects, coEvents);
 
-	if (coEvents.size() == 0)
+	if (coEvents.size() == 0 || uppingRight)
 	{
 		x += dx;
 		y += dy;
+		
 	}
 	else
 	{
@@ -422,15 +609,28 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		jumping = false;
 		injured = false;
 
+		allowUpStairsRight = false;
+		allowUpStairsLeft = false;
+		allowDownStairsRight = false;
+		allowDownStairsLeft = false;
+		//uppingRight = false;
+		//uppingLeft = false;
+
 		float min_tx, min_ty, nx = 0, ny;
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
-		x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-		y += min_ty * dy + ny * 0.4f;
+		
+		if (!uppingRight)
+		{
+			x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
+			y += min_ty * dy + ny * 0.4f;
 
+			if (nx != 0) vx = 0;
+			if (ny != 0) vy = 0;
 
-		if (nx != 0) vx = 0;
-		if (ny != 0) vy = 0;
+		}
+		
+		
 
 	}
 	// clean up collision events
@@ -448,8 +648,8 @@ bool CMario::CheckCollisionWithItem(vector<LPGAMEOBJECT>* listItem)
 
 			switch (idItem)
 			{
-			//case HOLY_WATER:
-			//	SetCurrentWeapons(idItem);
+			/*case HOLY_WATER:
+				SetCurrentWeapons(idItem);*/
 			}
 			return true;
 		}

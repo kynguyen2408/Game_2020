@@ -30,8 +30,6 @@ Nen::Nen()
 void Nen::Render()
 {
 
-	
-	
 	animations[ani]->Render(x, y);
 	RenderBoundingBox();
 }
@@ -47,7 +45,6 @@ void Nen::GetBoundingBox(float &left, float &top, float &right, float &bottom)
 
 	else
 		bottom = y + BRICK_BBOX_HEIGHT;
-//	bottom = y + BRICK_BBOX_HEIGHT;
 }
 
 void Nen::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)

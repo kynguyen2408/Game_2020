@@ -29,26 +29,29 @@ CRoi::CRoi() {
 }
 void CRoi::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	
-	if (mario->GetInstance()->whipType == 0) {
-		left = x + 30;
-		top = y + 20;
-		right = x + ROI_BBOX_WIDTH + 70;
-		bottom = y + ROI_BBOX_HEIGHT + 12;
+	int ani;
+	ani = mario->GetInstance()->currentRoi;
+	if (animations[ani]->currentFrame == 3)
+	{
+		if (mario->GetInstance()->whipType == 0) {
+			left = x + 30;
+			top = y + 20;
+			right = x + ROI_BBOX_WIDTH + 70;
+			bottom = y + ROI_BBOX_HEIGHT + 12;
+		}
+		else if (mario->GetInstance()->whipType == 1) {
+			left = x + 50;
+			top = y + 4;
+			right = x + ROI_BBOX_WIDTH + 100;
+			bottom = y + ROI_BBOX_HEIGHT + 4;
+		}
+		else if (mario->GetInstance()->whipType == 2) {
+			left = x + 50;
+			top = y + 4;
+			right = x + ROI_BBOX_WIDTH + 100;
+			bottom = y + ROI_BBOX_HEIGHT + 4;
+		}
 	}
-	else if (mario->GetInstance()->whipType == 1) {
-		left = x + 50;
-		top = y + 4;
-		right = x + ROI_BBOX_WIDTH + 100;
-		bottom = y + ROI_BBOX_HEIGHT + 4;
-	}
-	else if (mario->GetInstance()->whipType == 2) {
-		left = x + 50;
-		top = y + 4;
-		right = x + ROI_BBOX_WIDTH + 100;
-		bottom = y + ROI_BBOX_HEIGHT + 4;
-	}
-
 	
 }
 
@@ -83,8 +86,16 @@ void CRoi::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		for (UINT i = 0; i < coEvents.size(); i++)
 		{
-			if (coEvents.at(i)->type == GOOMBA_TYPE)
-				coEvents.at(i)->dead = true;
+			if (coEvents.at(i)->catalog == CATALOG_ENEMY)
+			{
+				if (ishitting == false) //xu li danh chet 1 enemy
+				{
+					{
+						coEvents.at(i)->dead = true;
+						ishitting = true;
+					}
+				}
+			}
 			else if (coEvents.at(i)->type == NEN_TYPE) {
 				coEvents.at(i)->SetState(CANDLE_STATE_BUMP);
 			}
@@ -103,15 +114,9 @@ void CRoi::Render()
 	if (animations[ani]->currentFrame == 3) {
 		dead = true;
 	}
-	
-
-
 	animations[ani]->Render(x, y);
+	RenderBoundingBox();
 
-	if(animations[ani]->currentFrame == 3)
-	{
-		RenderBoundingBox();
-	}
 	
 
 }
