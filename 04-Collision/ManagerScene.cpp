@@ -1,4 +1,5 @@
 #include "ManagerScene.h"
+#include <cstddef>
 
 ManagerScene* ManagerScene:: __instance = NULL;
 

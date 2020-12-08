@@ -16,7 +16,7 @@ CRiu::CRiu() {
 	}
 	else
 	{
-		AddAnimation(4001);
+		AddAnimation(807);
 		vx = -RIU_SPEED;
 		vy = -(RIU_SPEED + 0.2f);
 	}

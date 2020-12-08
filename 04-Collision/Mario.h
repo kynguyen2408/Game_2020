@@ -70,17 +70,19 @@ class CMario : public CGameObject
 {
 private:
 	static CMario* _instance;
-	int level;
+	
 	int untouchable;
 	DWORD untouchable_start;
 	static CMario * __instance;
 
 public: 
+	int levelMap;
 	boolean jumping = false;
 	boolean sitting = false;
 	boolean hitting = false;
 	boolean hitting_stairs = false;
 	boolean uppingRight = false;
+	boolean allowSit = true;
 	boolean uppingLeft = false;
 	int secondWeapon = 0;
 	boolean throwing = false;
@@ -110,7 +112,8 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 	void SetState(int state);
-	void SetLevel(int l) { level = l; }
+	bool chuyenCanhOne();
+	void respawn();
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	static CMario* GetInstance();
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);

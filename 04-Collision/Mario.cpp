@@ -50,6 +50,7 @@ CMario::CMario() : CGameObject()
 	mario_x = MARIO_X;
 	mario_y = MARIO_Y;
 	whipType = 0;
+	levelMap = 1;
 }
 	
 
@@ -73,6 +74,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 	}
 
+	if(!allowDownStairsRight)
+		allowSit = true;
+
 	// neu co va cham 
 	//k vo va cham 
 	if (coEventsStatic.size() == 0)
@@ -82,9 +86,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//co va cham dung yen
 	else
 	{
+		
 		for (UINT i = 0; i < coEventsStatic.size(); i++)
 		{
-
+		
 			if (coEventsStatic.at(i)->type == NEN_TYPE)
 			{
 				switch (coEventsStatic.at(i)->state)
@@ -110,26 +115,38 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				allowUpStairsRight = true;
 				allowDownStairsRight = false;
-				if (uppingRight )
-				{
-					uppingRight = false;
-				}	
-			
+				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
 			{
 				allowDownStairsRight = true;
+				allowSit = false;
 				allowUpStairsRight = false;
-				if (uppingRight)
-				{
-					uppingRight = false;
-				}
-				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
 			{
-				if (uppingLeft) uppingLeft = false;
-				else allowUpStairsLeft = true;
+				allowUpStairsLeft = true;
+				allowDownStairsLeft = false;
+			}
+			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_DOWN)
+			{
+				allowDownStairsLeft = true;
+				allowSit = false;
+				allowUpStairsLeft = false;
+			}
+			if (uppingRight)
+			{
+				if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
+					uppingRight = false;
+				if (coEventsStatic.at(i)->type == STAIRS_RIGHT_UP)
+					uppingRight = false;
+			}
+			if (uppingLeft)
+			{
+				if (coEventsStatic.at(i)->type == STAIRS_LEFT_DOWN)
+					uppingLeft = false;
+				if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
+					uppingLeft = false;
 			}
 		}
 
@@ -530,6 +547,7 @@ void CMario::SetState(int state)
 		ny = 0;
 		vx = 0.05;
 		vy = -0.05;
+		allowUpStairsRight = false;
 		uppingRight = true;
 		break;
 	case MARIO_STATE_UPSTAIRS_LEFT:
@@ -553,9 +571,6 @@ void CMario::SetState(int state)
 	case MARIO_STATE_STAND_STAIRS:
 		vx = 0;
 		vy = 0;
-		if (allowUpStairsRight || allowDownStairsRight)
-			uppingRight = true;
-		else uppingLeft = true;
 		break;
 	case MARIO_STATE_IDLE:
 		sitting = false;
@@ -597,7 +612,7 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// turn off collision when die 
 	CalcPotentialCollisions(coObjects, coEvents);
 
-	if (coEvents.size() == 0 || uppingRight)
+	if (coEvents.size() == 0 || uppingRight || uppingLeft)
 	{
 		x += dx;
 		y += dy;
@@ -608,7 +623,6 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		// block 
 		jumping = false;
 		injured = false;
-
 		allowUpStairsRight = false;
 		allowUpStairsLeft = false;
 		allowDownStairsRight = false;
@@ -620,7 +634,7 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny);
 		
-		if (!uppingRight)
+		if (!uppingRight&&!uppingLeft)
 		{
 			x += min_tx * dx + nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
 			y += min_ty * dy + ny * 0.4f;
@@ -629,9 +643,6 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (ny != 0) vy = 0;
 
 		}
-		
-		
-
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
@@ -660,4 +671,15 @@ CMario * CMario::GetInstance()
 {
 	if (__instance == NULL) __instance = new CMario();
 	return __instance;
+}
+
+bool CMario::chuyenCanhOne() {
+	if (x >= 1325 && levelMap == 1)
+		return true;
+	return false;
+}
+void CMario::respawn()
+{
+	x = MARIO_X;
+	y = MARIO_Y;
 }
