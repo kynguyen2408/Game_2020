@@ -61,8 +61,6 @@ public:
 	float width;
 	float height;
 	
-	float respawnX, respawnY;
-
 	DWORD dt; 
 
 	vector<LPANIMATION> animations;

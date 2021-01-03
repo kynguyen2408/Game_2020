@@ -1,8 +1,8 @@
 #pragma once
 #include "GameObject.h"
 
-#define PANTHER_RUN_SPEED 0.2f;
-#define PANTHER_GRAVITY			0.0015f
+#define PANTHER_RUN_SPEED 0.1f;
+#define PANTHER_GRAVITY			0.002f
 
 #define PANTHER_BBOX_WIDTH 50
 #define PANTHER_BBOX_HEIGHT 28
@@ -27,9 +27,6 @@ class CPanther : public CGameObject
 	
 	void Render();
 public:
-	float MovePosX, MovePosDesX;
-	void SetRangeMove(float a, float b) { this->MovePosX = a, this->MovePosDesX = b; }
-
 	CMario* mario;
 	CPanther();
 	void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);

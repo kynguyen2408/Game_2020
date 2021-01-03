@@ -1,14 +1,14 @@
 #include "Ball.h"
 
-CBall::CBall() {}
-CBall::CBall(float x, float y,int nx) {
+CBall::CBall() {
+
 	type = BALL_TYPE;
-	catalog = CATALOG_ENEMY;
+	float x_aquaman, y_aquaman;
 	AddAnimation(918); // dao phai
 	AddAnimation(917); // dao trai
-	SetPosition(x, y);
-	vx = nx * 0.2;
+
 	dead = false;
+
 }
 void CBall::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {

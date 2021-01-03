@@ -176,20 +176,16 @@ void CSampleKeyHander::KeyState(BYTE* states)
 			if (mario->allowUpStairsRight == true)
 			{
 				
-				if(mario->x + 24- mario->StairX >= 0.1 && !mario->uppingRight)
+				if(mario->x - mario->StairX >= 0.1 && !mario->uppingRight)
 					mario->SetState(MARIO_STATE_WALKING_LEFT);
-				else if ((mario->x + MARIO_BIG_BBOX_WIDTH) - mario->StairX >= 0.1 && mario->x <= mario->StairX)
+				if(mario->x + MARIO_BIG_BBOX_WIDTH - mario->StairX >= 0.1 && mario->x <= mario->StairX)
 					mario->SetState(MARIO_STATE_UPSTAIRS_RIGHT);
 				if (mario->x + MARIO_BIG_BBOX_WIDTH - mario->StairX <= 0.1)
 					mario->SetState(MARIO_STATE_WALKING_RIGHT);
 			}
 				
 			else if (mario->allowUpStairsLeft == true)
-			{
 				mario->SetState(MARIO_STATE_UPSTAIRS_LEFT);
-			
-				
-			}
 			else if (mario->uppingRight) mario->SetState(MARIO_STATE_UPSTAIRS_RIGHT);
 			else if (mario->uppingLeft) mario->SetState(MARIO_STATE_UPSTAIRS_LEFT);
 			else mario->SetState(MARIO_STATE_IDLE);
@@ -220,7 +216,7 @@ void PlayScene::CreateFileGird(int level)
 	sprintf_s(gridFileName, "text\\Grid%d.txt", level);
 	File.open(gridFileName);
 
-	float posX, posY, width, height, id, posTarX1 ,posTarX2, PosMoveSimonX, PosMoveSimonY;
+	float posX, posY, width, height, id, posTarX, PosMoveSimonX, PosMoveSimonY;
 
 	string str, type;
 	while (!File.eof())
@@ -280,33 +276,30 @@ void PlayScene::CreateFileGird(int level)
 			objects.push_back(brick);
 
 		}
-		else if (str == "GHOST") {
-			File >> posX >> posY >> width >> height >> posTarX1 >> posTarX2 ;
+		/*else if (str == "GHOST") {
+			File >> posX >> posY >> width >> height;
 			posY += 16;
 			CGoomba * ghost = new CGoomba();
 			ghost->SetPosition(posX, posY);
-			ghost->SetRangeMove(posTarX1, posTarX2);
 			ghost->SetState(GOOMBA_STATE_WALKING_LEFT);
 			ghost->SetWH(width, height);
 			objects.push_back(ghost);
 
-		}
+		}*/
 		else if (str == "BLACKPANTHER") {
-			File >> posX >> posY >> width >> height >> posTarX1 >> posTarX2;
+			File >> posX >> posY >> width >> height;
 			CPanther * panther = new CPanther();
 			panther->SetPosition(posX, posY);
 			panther->SetState(PANTHER_STATE_IDLE);
 			panther->SetWH(width, height);
-			panther->SetRangeMove(posTarX1, posTarX2);
 			objects.push_back(panther);
 
 		}
 		else if (str == "BAT") {
-			File >> posX >> posY >> width >> height >> posTarX1 >> posTarX2;
+			File >> posX >> posY >> width >> height;
 			CBat * bat = new CBat();
 			bat->SetPosition(posX, posY);
 			bat->SetWH(width, height);
-			bat->SetRangeMove(posTarX1, posTarX2);
 			objects.push_back(bat);
 
 		}
@@ -314,16 +307,14 @@ void PlayScene::CreateFileGird(int level)
 			File >> posX >> posY >> width >> height;
 			CAquaman * aquaman = new CAquaman();
 			aquaman->SetPosition(posX, posY);
-			aquaman->SetPositionMove(posX, posX+200);
-			aquaman->SetState(AQUAMAN_WALK_RIGHT);
+			aquaman->SetState(AQUAMAN_STATE_SIT_RIGHT);
 			aquaman->SetWH(width, height);
 			objects.push_back(aquaman);
 
 		}
 		else if (str == "STAIR") {
 			File >> posX >> posY >> width >> height >> str;
-			posY += 25;
-			height -= 30;
+			height -= 10;
 			if (str == "STAIR_BOTTOM_RIGHT") {
 				CStairs* stairs = new CStairs(STAIRS_RIGHT_UP);
 				stairs->SetPosition(posX, posY);
@@ -354,6 +345,20 @@ void PlayScene::CreateFileGird(int level)
 			}
 		}
 
+		//case STAIR:
+		//{
+		//	GridFile >> posX >> posY >> width >> height >> type;
+		//	GridFile >> left >> top >> right >> bot;
+		//	auto stair = new CStair(TYPEString[type]);
+		//	stair->SetPosition(posX, posY);
+		//	stair->width = width;
+		//	stair->height = height;
+
+		//	loop(r, top, bot)
+		//		loop(c, left, right)
+		//		cells[r][c]->objects.insert(stair);
+		//	break;
+		//}
 	}
 
 	File.close();
@@ -378,7 +383,7 @@ void PlayScene::LoadResources()
 	animations->LoadResources();
 
 	mario = mario->GetInstance();
-	mario->SetPosition(1270, mario->mario_y);
+	mario->SetPosition(1000, mario->mario_y);
 	
 
 	map = Map::GetInstance();
@@ -387,8 +392,23 @@ void PlayScene::LoadResources()
 	
 	CreateFileGird(1);
 
-	
-		
+	// Cau thang
+	//CStairs* stairs = new CStairs(STAIRS_RIGHT_UP);
+	//stairs->SetPosition(300, 366);
+	//objects.push_back(stairs);
+
+	//CStairs* stairs1 = new CStairs(STAIRS_RIGHT_DOWN);
+	//stairs1->SetPosition(375, 200);
+	//objects.push_back(stairs1);
+
+	//CStairs* stairs2 = new CStairs(STAIRS_LEFT_UP);
+	//stairs2->SetPosition(730, 366);
+	//objects.push_back(stairs2);
+
+	//CStairs* stairs3 = new CStairs(STAIRS_LEFT_DOWN);
+	//stairs3->SetPosition(650, 200);
+	//objects.push_back(stairs3);
+
 	//tao camera
 	camera = camera->GetInstance();
 	camera->map = 1;
@@ -454,27 +474,9 @@ void PlayScene::Update(float dt)
 			panther->VaChamDat(dt, &wallObjects);
 			panther->Update(dt, &coObjects);
 		}
-		else if (objects[i]->type == AQUAMAN_TYPE)
-		{
-			CAquaman* aqua = dynamic_cast<CAquaman*> (objects[i]);
-			aqua->VaChamDat(dt, &wallObjects);
-			aqua->Update(dt, &coObjects);
-			if (aqua->isFire) {
-				float tempX, tempY;
-				aqua->GetPosition(tempX, tempY);
-				if (aqua->nx < 0)
-					ball = new CBall(tempX, tempY,-1);
-				else ball = new CBall(tempX, tempY,1);
-				
-				objects.push_back(ball);
-				aqua->isFire = false;
-				if(aqua->nx<0)
-					aqua->SetState(AQUAMAN_WALK_LEFT);
-				else aqua->SetState(AQUAMAN_WALK_RIGHT);
-			}
-		}
 		else {
 			objects[i]->Update(dt, &coObjects);
+
 		}
 	}
 	for (int i = 0; i < objects.size(); i++)
@@ -486,25 +488,28 @@ void PlayScene::Update(float dt)
 			objects.erase(objects.begin() + i);
 		}
 	}
+	float x, y;
+	//aquaman->GetPosition(x, y);
+	//if (x == 400 || x == 100) {
+	//	ball = new CBall();
+	//	objects.push_back(ball);
+	//	aquaman->SetState(AQUAMAN_FIRE_LEFT);
+	//	aquaman->animations[0]->isLastFrame = false;
+	//}
+	//
 	
-	
-	if (mario->chuyenCanh() )
+	if (mario->chuyenCanhOne())
 	{
-		if (mario->levelMap == 2)
-		{
-			map->LoadResources(mario->levelMap);
-			objects.clear();
-			coObjects.clear();
-			wallObjects.clear();
-			objects.push_back(mario);
-			CreateFileGird(mario->levelMap);
-			mario-> respawnX = 3500;
-			mario-> respawnY = 0;
-			mario-> levelMap = 3;
-		}
-		else {
+		mario->levelMap = 2;
+		camera->map = 2;
 
-		}
+		map->LoadResources(mario->levelMap);
+		objects.clear();
+		coObjects.clear();
+		wallObjects.clear();
+		objects.push_back(mario);
+		CreateFileGird(mario->levelMap);
+
 		mario->respawn();
 	}
 	//aquaman->VaChamDat(dt, &wallObjects);
@@ -524,8 +529,8 @@ void PlayScene::Update(float dt)
 	cy -= SCREEN_HEIGHT / 2;
 
 	camera->x = cx;
-	camera->Update(mario->levelMap);
-	CGame::GetInstance()->SetCamPos(camera->x, camera->y);
+	camera->Update();
+	CGame::GetInstance()->SetCamPos(camera->x, 0.0f);
 };
 
 void PlayScene::Render()

@@ -113,7 +113,7 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 	void SetState(int state);
-	bool chuyenCanh();
+	bool chuyenCanhOne();
 	void respawn();
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 	static CMario* GetInstance();

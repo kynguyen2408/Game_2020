@@ -6,7 +6,7 @@ CCamera* CCamera::GetInstance()
 	if (_instance == NULL) _instance = new CCamera();
 	return _instance;
 }
-void CCamera::Update(int map)
+void CCamera::Update()
 {
 	switch (map)
 	{
@@ -45,7 +45,6 @@ void CCamera::Update(int map)
 		{
 			this->x = END_MAP3 - SCREEN_WIDTH;
 		}
-		this->y = 0;
 		break;
 	}
 	case 4:

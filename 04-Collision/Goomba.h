@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-#define GOOMBA_WALKING_SPEED 0.00f;
+#define GOOMBA_WALKING_SPEED 0.05f;
 
 #define GOOMBA_BBOX_WIDTH 30
 #define GOOMBA_BBOX_HEIGHT 60
@@ -25,12 +25,9 @@ class CGoomba : public CGameObject
 	void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	void Render();
-	
 
 
 public: 	
-	float MovePosX, MovePosDesX;
-	void SetRangeMove(float a, float b) { this->MovePosX = a, this->MovePosDesX = b; };
 	CGoomba();
 	void SetState(int state);
 };

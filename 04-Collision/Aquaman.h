@@ -15,7 +15,7 @@
 #define AQUAMAN_STATE_SIT_LEFT 70
 #define AQUAMAN_STATE_FIRE_RIGHT 80
 #define AQUAMAN_STATE_FIRE_LEFT 90
-#define AQUAMAN_GRAVITY			0.0015f
+#define AQUAMAN_GRAVITY			0.001f
 
 
 #define AQUAMAN_STAND_LEFT		0 
@@ -47,6 +47,7 @@ private:
 public:
 	boolean isFire;
 	float 	aquaman_move_left, aquaman_move_right;
+
 	void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	void Render();
