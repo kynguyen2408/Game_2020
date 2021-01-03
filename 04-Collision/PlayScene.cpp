@@ -238,9 +238,6 @@ void PlayScene::CreateFileGird(int level)
 			else if (str == "DOUBLE_SHOT") {
 				nen->setTypeItems(NEN_ANI_ITEM_DOUBLESHOT);
 			}
-			else if (str == "SMALL_HEART") {
-				nen->setTypeItems(NEN_ANI_ITEM_SMALL_HEART);
-			}
 			nen->SetPosition(posX, posY);
 			nen->SetWH(width, height);
 			objects.push_back(nen);
@@ -250,14 +247,21 @@ void PlayScene::CreateFileGird(int level)
 		{
 			File >> posX >> posY >> width >> height >> str;
 			Nen* nen = new Nen();
-
 			if (level == 2) {
 				nen->SetState(CANDLE_STATE_SMALL);
-				if (str == "SMALL_HEART") {
-					nen->setTypeItems(NEN_ANI_ITEM_SMALL_HEART);
-				}
 			}
-
+			if (str == "MORNING_STAR") {
+				nen->setTypeItems(NEN_ANI_ITEM_WHIP);
+			}
+			else if (str == "BIG_HEART") {
+				nen->setTypeItems(NEN_ANI_ITEM_BIG_HEART);
+			}
+			else if (str == "KNIFE") {
+				nen->setTypeItems(NEN_ANI_ITEM_KNIFE);
+			}
+			else if (str == "DOUBLE_SHOT") {
+				nen->setTypeItems(NEN_ANI_ITEM_DOUBLESHOT);
+			}
 			nen->SetPosition(posX, posY);
 			nen->SetWH(width, height);
 			objects.push_back(nen);
@@ -428,7 +432,6 @@ void PlayScene::Update(float dt)
 		else coObjects.push_back(objects[i]);
 	}
 	mario->vaChamTuong(dt, &wallObjects);
-	mario->Update(dt, &coObjects);
 
 	if (mario->hitting == true)
 	{

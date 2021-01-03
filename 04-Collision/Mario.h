@@ -104,6 +104,7 @@ public:
 	bool freeze;
 	int numWeapon;
 	boolean allowCreateSecondWeapon = true;
+	int currentRoi;
 	float StairX;
 
 	float mario_x, mario_y;
