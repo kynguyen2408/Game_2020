@@ -27,5 +27,6 @@ public:
 	void SetState(int state);
 	CAquaman* aquaman;
 	CBall();
+	CBall(float x,float y,int nx);
 };
 

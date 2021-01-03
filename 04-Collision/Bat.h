@@ -16,9 +16,12 @@ class CBat : public CGameObject
 	void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	void Render();
-
+	int ani;
 
 public:
+	float MovePosX, MovePosDesX;
+	void SetRangeMove(float a, float b) { this->MovePosX = a, this->MovePosDesX = b; }
+
 	CBat();
 	void SetState(int state);
 };

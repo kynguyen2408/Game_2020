@@ -20,6 +20,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
 	CGameObject::Update(dt, coObjects);
 
+	
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
@@ -27,12 +28,14 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	x += dx;
 	y += dy;
 
-	if (vx < 0 && x < 0) {
-		x = 0; vx = -vx;
+	if (vx < 0 && x < MovePosX) {
+		vx = -vx;
+		//x = MovePosX;
 	}
 
-	if (vx > 0 && x > 800) {
-		x = 790; vx = -vx;
+	if (vx > 0 && x > MovePosDesX) {
+		vx = -vx;
+		//x = MovePosDesX;
 	}
 }
 

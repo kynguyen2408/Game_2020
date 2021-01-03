@@ -1,7 +1,7 @@
 #include "Panther.h"
 #include "Mario.h"
 #include "Brick.h"
-
+#include "debug.h"
 CPanther::CPanther()
 {
 	type = PANTHER_TYPE;
@@ -27,8 +27,8 @@ void CPanther::GetBoundingBox(float& left, float& top, float& right, float& bott
 {
 	left = x;
 	top = y;
-	right = x + PANTHER_BBOX_WIDTH;
-	bottom = y + PANTHER_BBOX_HEIGHT;
+	right = x + width;
+	bottom = y + height;
 }
 
 void CPanther::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -43,7 +43,16 @@ void CPanther::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		SetState(PANTHER_STATE_RUN);
 	}
-	
+
+	//quay dau 
+	if (vx < 0 && x < MovePosX) {
+		dead = true;
+
+	}
+
+	if (vx > 0 && x > MovePosDesX) {
+		dead = true;
+	}
 	
 }
 
@@ -93,7 +102,7 @@ void CPanther::SetState(int state)
 		break;
 	case PANTHER_STATE_JUMP:
 		ny = -1;
-		vy = -0.6;
+		vy = -0.4;
 		jumping = true;
 		break;
 	case PANTHER_STATE_DIE:
@@ -114,30 +123,43 @@ void CPanther::VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	// turn off collision when die 
 	CalcPotentialCollisions(coObjects, coEvents);
-	
+
 
 	if (coEvents.size() == 0)
 	{
 		x += dx;
 		y += dy;
 	}
-	else 
+	else
 	{
 		float min_tx, min_ty, e_nx, e_ny;
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, e_nx, e_ny);
-		x += min_tx * dx + e_nx * 0.4f;		// nx*0.4f : need to push out a bit to avoid overlapping next frame
-		y += min_ty * dy + e_ny * 0.4f;
+		
 
-		if (e_nx != 0) vx = 0;
-		if (e_ny != 0) vy = 0;
-		if (jumping == true)
+		if (e_ny == 1 || e_nx != 0)
 		{
-			if (nx == 1) nx = -1;
-			else if (nx == -1) nx = 1;
-			jumping = false;
-			SetState(PANTHER_STATE_RUN);
+			x += dx;
+			y += dy;
+			
+
 		}
+		else
+		{
+			x += min_tx * dx + e_nx * 0.4f;		
+			y += min_ty * dy + e_ny * 0.4f;
+		
+			if (jumping == true)
+			{
+				if (nx == 1) nx = -1;
+				else if (nx == -1) nx = 1;
+				jumping = false;
+				SetState(PANTHER_STATE_RUN);
+			}
+		}
+		if (e_ny == -1) vy = 0;
+
+	
 		
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
@@ -147,10 +169,15 @@ void CPanther::VaChamDat(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CBrick* brick = dynamic_cast<CBrick*> (e->obj);
 				float w, h;
 				brick->GetWH(w, h);
-				if (x - brick->x <= 1 || (brick->x + w) - (x + 50) <= 1)
+				if (jumping==false)
 				{
-					SetState(PANTHER_STATE_JUMP);
+					if (x - brick->x <= 1 || (brick->x + w) - (x + 50) <= 1)
+					{
+
+						SetState(PANTHER_STATE_JUMP);
+					}
 				}
+				
 			}
 		}
 

@@ -6,6 +6,7 @@
 #include "Nen.h"
 #include "Stairs.h"
 #include "Goomba.h"
+#include "Dao.h"
 CMario::CMario() : CGameObject()
 {
 	AddAnimation(400);		// idle right
@@ -53,6 +54,9 @@ CMario::CMario() : CGameObject()
 	mario_y = MARIO_Y;
 	whipType = 0;
 	levelMap = 1;
+	respawnX = 50;
+	respawnY = 0;
+
 }
 	
 
@@ -119,7 +123,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				allowUpStairsRight = true;
 				allowDownStairsRight = false;
-				StairX = coEventsStatic.at(i)->x;
+				StairX = coEventsStatic.at(i)->x + 32;
 				
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_RIGHT_DOWN)
@@ -127,14 +131,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				allowDownStairsRight = true;
 				allowSit = false;
 				allowUpStairsRight = false;
-				StairX = coEventsStatic.at(i)->x;
+				StairX = coEventsStatic.at(i)->x +32;
 
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_UP)
 			{
 				allowUpStairsLeft = true;
 				allowDownStairsLeft = false;
-				StairX = coEventsStatic.at(i)->x;
+				StairX = coEventsStatic.at(i)->x + 32;
 
 			}
 			else if (coEventsStatic.at(i)->type == STAIRS_LEFT_DOWN)
@@ -142,7 +146,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				allowDownStairsLeft = true;
 				allowSit = false;
 				allowUpStairsLeft = false;
-				StairX = coEventsStatic.at(i)->x;
+				StairX = coEventsStatic.at(i)->x + 32;
 
 			}
 			if (uppingRight)
@@ -161,78 +165,78 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 
-		//xet vat di chuyen 
-		vector<LPCOLLISIONEVENT> coEventMoving;
-		vector<LPCOLLISIONEVENT> coEventsResultMoving;
-
-		coEventMoving.clear();
-		CalcPotentialCollisions(coObjects, coEventMoving);
-
-
-		if (coEventMoving.size() == 0)
-		{
-
-		}
-		else
-		{
-
-			float min_tx, min_ty, nx = 0, ny;
-
-			FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
-			for (UINT i = 0; i < coEventsResultMoving.size(); i++)
-			{
-				LPCOLLISIONEVENT e = coEventsResultMoving[i];
-				if (e->obj->catalog == CATALOG_ENEMY)
-				{
-
-					if (e->ny != 0) //va tram ben tren ben trai
-					{
-						if (CGameObject::GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = -CGameObject::nx;
-							if (vx <= 0)
-								vx = -0.1;
-							else
-								vx = 0.1;
-							SetState(MARIO_STATE_INJURED);
-						}
-					}
-					else if (e->nx < 0) //va tram vang ben trai
-					{
-						if (CGameObject::GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = 1;
-							vx = -0.1;
-							SetState(MARIO_STATE_INJURED);
-
-						}
-					}
-					else if (e->nx > 0) //va tram vang ben phai
-					{
-						if (e->obj->GetState() != MARIO_STATE_INJURED)
-						{
-							CGameObject::nx = -1;
-							vx = 0.1;
-							SetState(MARIO_STATE_INJURED);
-
-						}
-					}
-					/*else if (e->nx != 0)
-					{
-						if (untouchable==0)
-						{
-							if (goomba->GetState()!=GOOMBA_STATE_DIE)
-							{
-									SetState(MARIO_STATE_DIE);
-							}
-						}
-					}*/
-				}
-			}
-		}
-		for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
+	
 
 	}
+	//xet vat di chuyen 
+	vector<LPCOLLISIONEVENT> coEventMoving;
+	vector<LPCOLLISIONEVENT> coEventsResultMoving;
+
+	coEventMoving.clear();
+	CalcPotentialCollisions(coObjects, coEventMoving);
+
+
+	if (coEventMoving.size() == 0)
+	{
+
+	}
+	else
+	{
+
+		float min_tx, min_ty, nx = 0, ny;
+
+		FilterCollision(coEventMoving, coEventsResultMoving, min_tx, min_ty, nx, ny);
+		for (UINT i = 0; i < coEventsResultMoving.size(); i++)
+		{
+			LPCOLLISIONEVENT e = coEventsResultMoving[i];
+			if (e->obj->catalog == CATALOG_ENEMY)
+			{
+				if (e->ny != 0) //va tram ben tren ben trai
+				{
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = -CGameObject::nx;
+						if (vx <= 0)
+							vx = -0.1;
+						else
+							vx = 0.1;
+						SetState(MARIO_STATE_INJURED);
+					}
+				}
+				else if (e->nx < 0) //va tram vang ben trai
+				{
+					if (CGameObject::GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = 1;
+						vx = -0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				else if (e->nx > 0) //va tram vang ben phai
+				{
+					if (e->obj->GetState() != MARIO_STATE_INJURED)
+					{
+						CGameObject::nx = -1;
+						vx = 0.1;
+						SetState(MARIO_STATE_INJURED);
+
+					}
+				}
+				/*else if (e->nx != 0)
+				{
+					if (untouchable==0)
+					{
+						if (goomba->GetState()!=GOOMBA_STATE_DIE)
+						{
+								SetState(MARIO_STATE_DIE);
+						}
+					}
+				}*/
+			}
+		}
+	}
+	for (UINT i = 0; i < coEventMoving.size(); i++) delete coEventMoving[i];
 }
 
 	
@@ -618,6 +622,13 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 	if(!uppingRight && !uppingLeft)
 		vy +=MARIO_GRAVITY * dt;
+	else if(injured)
+	{
+		vy += MARIO_GRAVITY * dt;
+		uppingRight = false;
+		uppingLeft = false;
+	}
+		
 	coEvents.clear();
 
 	// turn off collision when die 
@@ -627,7 +638,7 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-		
+		DebugOut(L"move on stair: %d , %d\n", uppingLeft, uppingRight);
 	}
 	else
 	{
@@ -652,6 +663,11 @@ void CMario::vaChamTuong(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 			if (nx != 0) vx = 0;
 			if (ny != 0) vy = 0;
+			DebugOut(L"move on block: %d %d\n", uppingRight, uppingLeft);
+		}
+		else
+		{
+			
 
 		}
 	}
@@ -684,13 +700,63 @@ CMario * CMario::GetInstance()
 	return __instance;
 }
 
-bool CMario::chuyenCanhOne() {
+bool CMario::chuyenCanh() {
+
 	if (x >= 1325 && levelMap == 1)
+	{
+		respawnX = 0;
+		respawnY = 300;
+		levelMap = 2;
 		return true;
-	return false;
+	}
+	else if (x >= 3002 && x<= 3005 && y <= 150)
+	{
+		respawnX = 3100;
+		respawnY = 130;
+		levelMap = 3;
+		return true;
+	}
+	else if (x >= 3170 && x <= 3180 && y >= 380 && y < 400)
+	{
+		levelMap = 4;
+		respawnX = 3180;
+		respawnY = 450;
+		return true;
+	}
+	else if (x >= 3155 && x <= 3170 && y >= 420 && y < 450)
+	{
+		levelMap = 3;
+		respawnX = 3150;
+		respawnY = 360;
+		return true;
+	}
+	else if (x >= 3785 && x <= 3805 && y >= 420 && y < 450)
+	{
+		levelMap = 3;
+		respawnX = 3802;
+		respawnY = 360;
+		return true;
+	}
+	else if (x >= 3820 && x <= 3835 && y >= 380 && y < 400)
+	{
+		levelMap = 4;
+		respawnX = 3825;
+		respawnY = 450;
+		return true;
+	}
+	else if (x >= 4015 && x <= 4020 && y <= 150)
+	{
+		respawnX = 4100;
+		respawnY = 130;
+		levelMap = 5;
+		return true;
+	}
+	else return false;
+
 }
 void CMario::respawn()
 {
-	x = 1000;
-	y = MARIO_Y;
+	x = respawnX;
+	y = respawnY;
+	//SetState(MARIO_STATE_WALKING_RIGHT);
 }
